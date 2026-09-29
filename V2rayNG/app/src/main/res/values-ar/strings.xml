@@ -569,4 +569,12 @@
     <string name="connection_test_empty_message">لا تتوفر تفاصيل</string>
     <string name="value_unknown">غير معروف</string>
 
+
+    <!-- Stratos premium UI -->
+    <string name="stratos_show_password">إظهار كلمة المرور</string>
+    <string name="stratos_hide_password">إخفاء كلمة المرور</string>
+    <string name="stratos_server_count">%1$d خوادم</string>
+    <string name="stratos_expanded">موسّع</string>
+    <string name="stratos_collapsed">مطوي</string>
+    <string name="stratos_powered_by">مدعوم بواسطة v2rayNG • GPLv3</string>
 </resources>

@@ -112,4 +112,14 @@
     <string name="stratos_kicked_title">Signed out</string>
     <string name="stratos_kicked_message">Your account was signed in on another device or your session ended.</string>
     <string name="stratos_notice_title">Notice</string>
+
+    <!-- Stratos premium UI -->
+    <string name="stratos_language_persian" translatable="false">فارسی</string>
+    <string name="stratos_language_english" translatable="false">English</string>
+    <string name="stratos_show_password">Show password</string>
+    <string name="stratos_hide_password">Hide password</string>
+    <string name="stratos_server_count">%1$d servers</string>
+    <string name="stratos_expanded">Expanded</string>
+    <string name="stratos_collapsed">Collapsed</string>
+    <string name="stratos_powered_by">Powered by v2rayNG • GPLv3</string>
 </resources>

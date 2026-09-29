@@ -561,4 +561,12 @@
     <string name="connection_test_empty_message">دووسمندی نؽ</string>
     <string name="value_unknown">نا مؽخص</string>
 
+
+    <!-- Stratos premium UI -->
+    <string name="stratos_show_password">نیشووݩ داڌن رمز</string>
+    <string name="stratos_hide_password">قايم کردݩ رمز</string>
+    <string name="stratos_server_count">%1$d سرور</string>
+    <string name="stratos_expanded">واز بیڌه</string>
+    <string name="stratos_collapsed">بسته بیڌه</string>
+    <string name="stratos_powered_by">ساخته بیڌه وا v2rayNG • GPLv3</string>
 </resources>

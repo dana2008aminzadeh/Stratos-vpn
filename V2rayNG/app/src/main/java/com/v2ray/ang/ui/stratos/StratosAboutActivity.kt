@@ -2,7 +2,10 @@ package com.v2ray.ang.ui.stratos
 
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,30 +15,32 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.stratos.StratosSession
@@ -78,70 +83,121 @@ private fun StratosAboutScreen(
                     title = {
                         Text(
                             stringResource(R.string.stratos_menu_about),
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                painterResource(R.drawable.ic_stratos_back_24),
-                                contentDescription = stringResource(R.string.acc_back),
-                            )
-                        }
+                        StratosIconAction(
+                            icon = R.drawable.ic_stratos_back_24,
+                            contentDescription = stringResource(R.string.acc_back),
+                            onClick = onBack,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 )
             },
         ) { innerPadding ->
-            Column(
+            Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .padding(innerPadding),
             ) {
-                Spacer(Modifier.height(36.dp))
-                StratosLogo(110.dp, contentDescription = stringResource(R.string.app_name))
-                Spacer(Modifier.height(16.dp))
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .widthIn(max = 600.dp)
+                        .align(Alignment.TopCenter)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 22.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Spacer(Modifier.height(24.dp))
+                Box(
+                    modifier = Modifier
+                        .size(132.dp)
+                        .background(
+                            Brush.radialGradient(
+                                listOf(
+                                    StratosColors.Cyan.copy(alpha = 0.18f),
+                                    StratosColors.Indigo.copy(alpha = 0.08f),
+                                    Color.Transparent,
+                                ),
+                            ),
+                            CircleShape,
+                        )
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.44f),
+                            CircleShape,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    StratosLogo(104.dp, contentDescription = null)
+                }
+                Spacer(Modifier.height(15.dp))
                 Text(
                     stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = (-0.4).sp,
                 )
                 Text(
                     stringResource(R.string.stratos_tagline),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = StratosColors.Cyan,
+                    letterSpacing = 1.sp,
                 )
                 Spacer(Modifier.height(6.dp))
-                Text(
-                    stringResource(R.string.stratos_version, BuildConfig.VERSION_NAME),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-
-                Spacer(Modifier.height(28.dp))
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.7f),
-                    ),
-                    shape = RoundedCornerShape(20.dp),
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.64f),
+                    shape = RoundedCornerShape(50),
                 ) {
                     Text(
-                        stringResource(R.string.stratos_about_text),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(20.dp),
+                        stringResource(R.string.stratos_version, BuildConfig.VERSION_NAME),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     )
                 }
 
                 Spacer(Modifier.height(24.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                StratosGlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.ic_stratos_shield_24),
+                            contentDescription = null,
+                            tint = StratosColors.Cyan,
+                            modifier = Modifier.size(25.dp),
+                        )
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            stringResource(R.string.stratos_about_text),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(18.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
                     OutlinedButton(
                         onClick = onWebsite,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp),
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_stratos_web_24),
@@ -149,11 +205,14 @@ private fun StratosAboutScreen(
                             modifier = Modifier.size(18.dp),
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.stratos_menu_website))
+                        Text(stringResource(R.string.stratos_menu_website), fontWeight = FontWeight.SemiBold)
                     }
                     FilledTonalButton(
                         onClick = onTelegram,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp),
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_stratos_telegram_24),
@@ -161,17 +220,18 @@ private fun StratosAboutScreen(
                             modifier = Modifier.size(18.dp),
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.stratos_menu_telegram))
+                        Text(stringResource(R.string.stratos_menu_telegram), fontWeight = FontWeight.SemiBold)
                     }
                 }
 
-                Spacer(Modifier.height(36.dp))
+                Spacer(Modifier.height(30.dp))
                 Text(
-                    "Powered by v2rayNG • GPLv3",
+                    stringResource(R.string.stratos_powered_by),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.64f),
                 )
-                Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(24.dp))
+                }
             }
         }
     }

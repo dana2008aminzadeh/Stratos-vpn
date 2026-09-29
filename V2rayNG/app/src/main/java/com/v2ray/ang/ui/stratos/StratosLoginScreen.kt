@@ -1,24 +1,28 @@
 package com.v2ray.ang.ui.stratos
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,10 +36,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -61,192 +64,247 @@ fun StratosLoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing)
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 32.dp),
+                .padding(horizontal = 22.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Spacer(Modifier.height(24.dp))
-            StratosLogo(96.dp, contentDescription = stringResource(R.string.app_name))
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.stratos_login_title),
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.stratos_login_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(28.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = 480.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Column(
-                    Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                ) {
-                    OutlinedTextField(
-                        value = state.username,
-                        onValueChange = { onAction(StratosLoginAction.UsernameChanged(it)) },
-                        label = { Text(stringResource(R.string.stratos_username)) },
-                        placeholder = { Text("fyx12345") },
-                        singleLine = true,
-                        isError = state.usernameErrorRes != null,
-                        supportingText = state.usernameErrorRes?.let { res ->
-                            { Text(stringResource(res), color = MaterialTheme.colorScheme.error) }
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painterResource(R.drawable.ic_stratos_user_24),
-                                contentDescription = null,
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Ascii,
-                            imeAction = ImeAction.Next,
-                        ),
-                        colors = stratosFieldColors(),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                Spacer(Modifier.height(12.dp))
+                StratosLoginMark()
+                Spacer(Modifier.height(18.dp))
+                Text(
+                    text = stringResource(R.string.stratos_login_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = (-0.3).sp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.stratos_login_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(26.dp))
 
-                    OutlinedTextField(
-                        value = state.password,
-                        onValueChange = { onAction(StratosLoginAction.PasswordChanged(it)) },
-                        label = { Text(stringResource(R.string.stratos_password)) },
-                        singleLine = true,
-                        isError = state.passwordErrorRes != null,
-                        supportingText = state.passwordErrorRes?.let { res ->
-                            { Text(stringResource(res), color = MaterialTheme.colorScheme.error) }
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painterResource(R.drawable.ic_stratos_lock_24),
-                                contentDescription = null,
-                            )
-                        },
-                        trailingIcon = {
-                            val desc = stringResource(R.string.stratos_password)
-                            IconButton(onClick = { onAction(StratosLoginAction.TogglePasswordVisibility) }) {
+                StratosGlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(28.dp),
+                ) {
+                    Column(
+                        Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(15.dp),
+                    ) {
+                        OutlinedTextField(
+                            value = state.username,
+                            onValueChange = { onAction(StratosLoginAction.UsernameChanged(it)) },
+                            label = { Text(stringResource(R.string.stratos_username)) },
+                            singleLine = true,
+                            isError = state.usernameErrorRes != null,
+                            supportingText = state.usernameErrorRes?.let { res ->
+                                { Text(stringResource(res), color = MaterialTheme.colorScheme.error) }
+                            },
+                            leadingIcon = {
                                 Icon(
-                                    painterResource(
-                                        if (state.passwordVisible) R.drawable.ic_stratos_eye_off_24
-                                        else R.drawable.ic_stratos_eye_24,
-                                    ),
-                                    contentDescription = desc,
+                                    painterResource(R.drawable.ic_stratos_user_24),
+                                    contentDescription = null,
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Ascii,
+                                imeAction = ImeAction.Next,
+                            ),
+                            shape = RoundedCornerShape(17.dp),
+                            colors = stratosFieldColors(),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+
+                        OutlinedTextField(
+                            value = state.password,
+                            onValueChange = { onAction(StratosLoginAction.PasswordChanged(it)) },
+                            label = { Text(stringResource(R.string.stratos_password)) },
+                            singleLine = true,
+                            isError = state.passwordErrorRes != null,
+                            supportingText = state.passwordErrorRes?.let { res ->
+                                { Text(stringResource(res), color = MaterialTheme.colorScheme.error) }
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painterResource(R.drawable.ic_stratos_lock_24),
+                                    contentDescription = null,
+                                )
+                            },
+                            trailingIcon = {
+                                val description = stringResource(
+                                    if (state.passwordVisible) R.string.stratos_hide_password
+                                    else R.string.stratos_show_password,
+                                )
+                                IconButton(onClick = { onAction(StratosLoginAction.TogglePasswordVisibility) }) {
+                                    Icon(
+                                        painterResource(
+                                            if (state.passwordVisible) R.drawable.ic_stratos_eye_off_24
+                                            else R.drawable.ic_stratos_eye_24,
+                                        ),
+                                        contentDescription = description,
+                                    )
+                                }
+                            },
+                            visualTransformation = if (state.passwordVisible) VisualTransformation.None
+                            else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = { onAction(StratosLoginAction.Submit) },
+                            ),
+                            shape = RoundedCornerShape(17.dp),
+                            colors = stratosFieldColors(),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+
+                        state.generalErrorRes?.let { res ->
+                            Surface(
+                                color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.72f),
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Text(
+                                    text = stringResource(res),
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
                                 )
                             }
-                        },
-                        visualTransformation = if (state.passwordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = { onAction(StratosLoginAction.Submit) },
-                        ),
-                        colors = stratosFieldColors(),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                        }
 
-                    state.generalErrorRes?.let { res ->
-                        Surface(
-                            color = MaterialTheme.colorScheme.errorContainer,
-                            shape = RoundedCornerShape(12.dp),
+                        StratosPrimaryButton(
+                            onClick = { onAction(StratosLoginAction.Submit) },
+                            enabled = !state.isLoading,
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
+                            if (state.isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(21.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp,
+                                )
+                                Spacer(Modifier.size(10.dp))
+                                Text(
+                                    stringResource(R.string.stratos_logging_in),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            } else {
+                                Text(
+                                    stringResource(R.string.stratos_login),
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.2.sp,
+                                )
+                            }
+                        }
+
+                        OutlinedButton(
+                            onClick = onScanQr,
+                            enabled = !state.isLoading,
+                            shape = RoundedCornerShape(17.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.ic_stratos_qr_24),
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                            )
+                            Spacer(Modifier.size(9.dp))
                             Text(
-                                text = stringResource(res),
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                stringResource(R.string.stratos_login_with_qr),
+                                fontWeight = FontWeight.SemiBold,
                             )
                         }
-                    }
-
-                    Button(
-                        onClick = { onAction(StratosLoginAction.Submit) },
-                        enabled = !state.isLoading,
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                    ) {
-                        if (state.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(22.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                strokeWidth = 2.dp,
-                            )
-                            Spacer(Modifier.size(10.dp))
-                            Text(stringResource(R.string.stratos_logging_in))
-                        } else {
-                            Text(
-                                stringResource(R.string.stratos_login),
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                        }
-                    }
-
-                    OutlinedButton(
-                        onClick = onScanQr,
-                        enabled = !state.isLoading,
-                        shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.ic_stratos_qr_24),
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
-                        )
-                        Spacer(Modifier.size(8.dp))
-                        Text(stringResource(R.string.stratos_login_with_qr))
                     }
                 }
-            }
 
-            Spacer(Modifier.height(20.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    text = stringResource(R.string.stratos_tagline),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = "  •  " + stringResource(R.string.stratos_version, BuildConfig.VERSION_NAME),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                    fontSize = 12.sp,
-                )
+                Spacer(Modifier.height(22.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Text(
+                        text = stringResource(R.string.stratos_tagline),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        letterSpacing = 0.8.sp,
+                    )
+                    Text(
+                        text = "  •  " + stringResource(R.string.stratos_version, BuildConfig.VERSION_NAME),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.68f),
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
             }
-            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun StratosLoginMark() {
+    Box(
+        modifier = Modifier
+            .size(116.dp)
+            .background(
+                brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                    listOf(
+                        StratosColors.Cyan.copy(alpha = 0.18f),
+                        StratosColors.Indigo.copy(alpha = 0.08f),
+                        Color.Transparent,
+                    ),
+                ),
+                shape = CircleShape,
+            )
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.38f),
+                shape = CircleShape,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            Modifier
+                .size(92.dp)
+                .border(
+                    width = 1.dp,
+                    color = StratosColors.Cyan.copy(alpha = 0.22f),
+                    shape = CircleShape,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            StratosLogo(88.dp, contentDescription = null)
         }
     }
 }
 
 @Composable
 private fun stratosFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = MaterialTheme.colorScheme.primary,
-    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-    focusedLabelColor = MaterialTheme.colorScheme.primary,
-    cursorColor = MaterialTheme.colorScheme.primary,
+    focusedBorderColor = StratosColors.Cyan,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.78f),
+    focusedLabelColor = StratosColors.Cyan,
+    focusedLeadingIconColor = StratosColors.Cyan,
+    cursorColor = StratosColors.Cyan,
+    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.48f),
+    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.34f),
 )

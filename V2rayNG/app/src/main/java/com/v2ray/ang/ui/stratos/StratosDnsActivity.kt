@@ -3,8 +3,10 @@ package com.v2ray.ang.ui.stratos
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,15 +16,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -35,8 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -124,80 +128,112 @@ private fun StratosDnsScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(
-                            stringResource(R.string.stratos_dns_title),
-                            fontWeight = FontWeight.Bold,
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                painterResource(R.drawable.ic_stratos_back_24),
-                                contentDescription = stringResource(R.string.acc_back),
+                        Column {
+                            Text(
+                                stringResource(R.string.stratos_dns_title),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                            )
+                            Text(
+                                stringResource(R.string.stratos_tagline),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
+                    },
+                    navigationIcon = {
+                        StratosIconAction(
+                            icon = R.drawable.ic_stratos_back_24,
+                            contentDescription = stringResource(R.string.acc_back),
+                            onClick = onBack,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 )
             },
         ) { innerPadding ->
-            Column(
+            Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                    .padding(innerPadding),
             ) {
-                Spacer(Modifier.height(6.dp))
-                StratosSettingsController.dnsPresets.forEach { preset ->
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .widthIn(max = 680.dp)
+                        .align(Alignment.TopCenter)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(11.dp),
+                ) {
+                    Spacer(Modifier.height(4.dp))
+                    StratosSettingsController.dnsPresets.forEach { preset ->
                     val selected = preset.id == selectedId
                     val label = stringResource(preset.labelRes)
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (selected)
-                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                            else MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.7f),
-                        ),
-                        shape = RoundedCornerShape(18.dp),
+                    StratosGlassCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .then(
+                                if (selected) Modifier.border(
+                                    1.dp,
+                                    StratosColors.Cyan.copy(alpha = 0.40f),
+                                    RoundedCornerShape(22.dp),
+                                ) else Modifier,
+                            )
+                            .clip(RoundedCornerShape(22.dp))
+                            .clickable(role = Role.RadioButton) { onSelect(preset.id) }
+                            .semantics(mergeDescendants = true) {
+                                role = Role.RadioButton
+                                this.selected = selected
+                            },
+                        shape = RoundedCornerShape(22.dp),
                     ) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(18.dp))
-                                .clickable { onSelect(preset.id) }
-                                .semantics {
-                                    role = Role.RadioButton
-                                    contentDescription = label
-                                }
-                                .padding(horizontal = 14.dp, vertical = 14.dp),
+                            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            RadioButton(selected = selected, onClick = null)
-                            Spacer(Modifier.width(10.dp))
-                            Icon(
-                                painterResource(R.drawable.ic_stratos_shield_24),
-                                contentDescription = null,
-                                tint = if (selected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(22.dp),
-                            )
-                            Spacer(Modifier.width(12.dp))
-                            Column {
+                            Surface(
+                                color = if (selected) StratosColors.Cyan.copy(alpha = 0.13f)
+                                else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.58f),
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.size(46.dp),
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        painterResource(R.drawable.ic_stratos_shield_24),
+                                        contentDescription = null,
+                                        tint = if (selected) StratosColors.Cyan
+                                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(23.dp),
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.width(13.dp))
+                            Column(Modifier.weight(1f)) {
                                 Text(
                                     label,
                                     style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (selected) StratosColors.Cyan
+                                    else MaterialTheme.colorScheme.onSurface,
                                 )
-                                Spacer(Modifier.height(2.dp))
+                                Spacer(Modifier.height(3.dp))
                                 Text(
                                     stringResource(preset.descRes),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
+                            RadioButton(
+                                selected = selected,
+                                onClick = null,
+                                modifier = Modifier.clearAndSetSemantics { },
+                            )
                         }
                     }
+                    }
+                    Spacer(Modifier.height(18.dp))
                 }
             }
         }
