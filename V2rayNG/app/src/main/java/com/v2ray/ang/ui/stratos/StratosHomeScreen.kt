@@ -9,6 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -136,10 +137,23 @@ fun StratosHomeScreen(
                 topBar = {
                     TopAppBar(
                         title = {
-                            Text(
-                                stringResource(R.string.app_name),
-                                fontWeight = FontWeight.Bold,
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                StratosLogo(34.dp, contentDescription = null)
+                                Spacer(Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        stringResource(R.string.app_name),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.4.sp,
+                                    )
+                                    Text(
+                                        stringResource(R.string.stratos_tagline),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
                         },
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
@@ -343,14 +357,34 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
         val connectDesc = stringResource(
             if (connected) R.string.stratos_disconnect else R.string.stratos_connect,
         )
+        val ringSurface = MaterialTheme.colorScheme.surface
         Box(
             modifier = Modifier
-                .size(230.dp)
-                .semantics { contentDescription = connectDesc; role = Role.Button },
+                .size(238.dp)
+                .clip(CircleShape)
+                .clickable(enabled = !connecting, onClick = onToggle)
+                .semantics(mergeDescendants = true) {
+                    contentDescription = connectDesc
+                    role = Role.Button
+                },
             contentAlignment = Alignment.Center,
         ) {
             Canvas(Modifier.fillMaxSize()) {
-                val stroke = 11.dp.toPx()
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            (if (connected) StratosColors.Cyan else StratosColors.Indigo)
+                                .copy(alpha = 0.20f * glowPulse),
+                            Color.Transparent,
+                        ),
+                    ),
+                    radius = size.minDimension * 0.5f,
+                )
+                drawCircle(
+                    color = ringSurface.copy(alpha = 0.42f),
+                    radius = size.minDimension * 0.445f,
+                )
+                val stroke = 10.dp.toPx()
                 val inset = stroke / 2 + 2.dp.toPx()
                 val diameter = size.minDimension - inset * 2
                 val topLeft = Offset((size.width - diameter) / 2, (size.height - diameter) / 2)
@@ -404,8 +438,11 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
                     .size(178.dp)
                     .clip(CircleShape)
                     .background(buttonBrush)
-                    .clickable(enabled = !connecting, onClick = onToggle)
-                    .semantics { role = Role.Button },
+                    .border(
+                        1.dp,
+                        Color.White.copy(alpha = if (connected || connecting) 0.28f else 0.10f),
+                        CircleShape,
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -472,32 +509,40 @@ private fun StratosSelectorChip(
     modifier: Modifier = Modifier,
     contentDescription: String,
 ) {
-    Card(
+    StratosGlassSurface(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(18.dp))
             .clickable(onClick = onClick)
-            .semantics { this.contentDescription = contentDescription; role = Role.Button },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.6f),
-        ),
-        shape = RoundedCornerShape(16.dp),
+            .semantics(mergeDescendants = true) {
+                this.contentDescription = contentDescription
+                role = Role.Button
+            },
+        cornerRadius = 18.dp,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                painterResource(icon),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.size(20.dp),
-            )
+            Surface(
+                shape = CircleShape,
+                color = StratosColors.Cyan.copy(alpha = 0.12f),
+                modifier = Modifier.size(34.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        painterResource(icon),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(
                     label,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -506,6 +551,7 @@ private fun StratosSelectorChip(
                     subtitle,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    letterSpacing = 0.6.sp,
                     maxLines = 1,
                 )
             }
@@ -520,26 +566,31 @@ private fun StratosInfoCard(
     modifier: Modifier = Modifier,
     accent: Boolean = false,
 ) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.6f),
-        ),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Column(Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-            Text(
-                title,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(2.dp))
+    StratosGlassSurface(modifier = modifier, cornerRadius = 18.dp) {
+        Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (accent) StratosColors.Success
+                            else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
+                        ),
+                )
+                Spacer(Modifier.width(7.dp))
+                Text(
+                    title,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.height(4.dp))
             Text(
                 value,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
-                color = if (accent) MaterialTheme.colorScheme.secondary
-                else MaterialTheme.colorScheme.onSurface,
+                color = if (accent) StratosColors.Success else MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )

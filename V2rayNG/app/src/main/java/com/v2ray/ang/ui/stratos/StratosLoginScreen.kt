@@ -17,8 +17,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,8 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,11 +64,14 @@ fun StratosLoginScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Spacer(Modifier.height(24.dp))
-            StratosLogo(96.dp, contentDescription = stringResource(R.string.app_name))
-            Spacer(Modifier.height(16.dp))
+            StratosLogo(112.dp, contentDescription = stringResource(R.string.app_name))
+            Spacer(Modifier.height(18.dp))
             Text(
                 text = stringResource(R.string.stratos_login_title),
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.5).sp,
+                ),
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
             )
@@ -85,13 +84,9 @@ fun StratosLoginScreen(
             )
             Spacer(Modifier.height(28.dp))
 
-            Card(
+            StratosGlassSurface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                cornerRadius = 28.dp,
             ) {
                 Column(
                     Modifier.padding(20.dp),
@@ -118,6 +113,7 @@ fun StratosLoginScreen(
                             imeAction = ImeAction.Next,
                         ),
                         colors = stratosFieldColors(),
+                        shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                     )
 
@@ -158,6 +154,7 @@ fun StratosLoginScreen(
                             onDone = { onAction(StratosLoginAction.Submit) },
                         ),
                         colors = stratosFieldColors(),
+                        shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth(),
                     )
 
@@ -178,13 +175,14 @@ fun StratosLoginScreen(
                     Button(
                         onClick = { onAction(StratosLoginAction.Submit) },
                         enabled = !state.isLoading,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(18.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
+                            containerColor = StratosColors.Indigo,
+                            contentColor = androidx.compose.ui.graphics.Color.White,
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp),
+                            .height(54.dp),
                     ) {
                         if (state.isLoading) {
                             CircularProgressIndicator(
@@ -205,10 +203,10 @@ fun StratosLoginScreen(
                     OutlinedButton(
                         onClick = onScanQr,
                         enabled = !state.isLoading,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(18.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp),
+                            .height(52.dp),
                     ) {
                         Icon(
                             painterResource(R.drawable.ic_stratos_qr_24),

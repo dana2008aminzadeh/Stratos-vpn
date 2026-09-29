@@ -20,8 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -43,8 +42,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -114,11 +113,15 @@ fun StratosServersScreen(
                 Button(
                     onClick = { onAction(StratosServersAction.AutoConnect) },
                     enabled = !state.isTesting && !state.isEmpty,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = StratosColors.Indigo,
+                        contentColor = Color.White,
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
-                        .height(52.dp),
+                        .height(56.dp),
                 ) {
                     if (state.isAutoConnecting) {
                         CircularProgressIndicator(
@@ -204,19 +207,14 @@ private fun StratosCountryCard(
     onToggle: () -> Unit,
     onSelect: (com.v2ray.ang.stratos.StratosServer) -> Unit,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.7f),
-        ),
-        shape = RoundedCornerShape(18.dp),
-    ) {
+    StratosGlassSurface(cornerRadius = 20.dp) {
         Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(18.dp))
                     .clickable(onClick = onToggle)
-                    .semantics { role = Role.Button }
+                    .semantics(mergeDescendants = true) { role = Role.Button }
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -270,14 +268,16 @@ private fun StratosServerRowItem(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val selectDesc = stringResource(R.string.stratos_selected)
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(
+                if (selected) StratosColors.Indigo.copy(alpha = 0.10f) else Color.Transparent,
+            )
             .clickable(onClick = onClick)
-            .semantics {
-                role = Role.Button
-                if (selected) contentDescription = selectDesc
+            .semantics(mergeDescendants = true) {
+                role = Role.RadioButton
+                this.selected = selected
             }
             .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
