@@ -561,4 +561,12 @@
     <string name="connection_test_empty_message">কোনো বিবরণ পাওয়া যায়নি</string>
     <string name="value_unknown">অজানা</string>
 
+
+    <!-- Stratos premium UI -->
+    <string name="stratos_show_password">পাসওয়ার্ড দেখান</string>
+    <string name="stratos_hide_password">পাসওয়ার্ড লুকান</string>
+    <string name="stratos_server_count">%1$dটি সার্ভার</string>
+    <string name="stratos_expanded">প্রসারিত</string>
+    <string name="stratos_collapsed">সংকুচিত</string>
+    <string name="stratos_powered_by">v2rayNG দ্বারা চালিত • GPLv3</string>
 </resources>

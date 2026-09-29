@@ -9,6 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,21 +22,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -82,7 +80,6 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toTrafficString
-import com.v2ray.ang.stratos.StratosServersStore
 import com.v2ray.ang.stratos.StratosSession
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
@@ -136,33 +133,40 @@ fun StratosHomeScreen(
                 topBar = {
                     TopAppBar(
                         title = {
-                            Text(
-                                stringResource(R.string.app_name),
-                                fontWeight = FontWeight.Bold,
+                            StratosBrandLockup(
+                                title = stringResource(R.string.app_name),
+                                subtitle = stringResource(R.string.stratos_tagline),
+                                compact = true,
                             )
                         },
                         navigationIcon = {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(
-                                    painterResource(R.drawable.ic_stratos_menu_24),
-                                    contentDescription = stringResource(R.string.acc_open_menu),
-                                )
-                            }
+                            StratosIconAction(
+                                icon = R.drawable.ic_stratos_menu_24,
+                                contentDescription = stringResource(R.string.acc_open_menu),
+                                onClick = { scope.launch { drawerState.open() } },
+                                modifier = Modifier.padding(start = 8.dp),
+                            )
                         },
                         actions = {
-                            IconButton(
+                            StratosIconAction(
+                                icon = R.drawable.ic_stratos_refresh_24,
+                                contentDescription = stringResource(R.string.stratos_refresh),
                                 onClick = { onAction(StratosHomeAction.Refresh) },
                                 enabled = !state.isSyncing,
+                                modifier = Modifier.padding(end = 12.dp),
                             ) {
                                 if (state.isSyncing) {
                                     CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
+                                        modifier = Modifier.size(18.dp),
+                                        color = StratosColors.Cyan,
                                         strokeWidth = 2.dp,
                                     )
                                 } else {
                                     Icon(
                                         painterResource(R.drawable.ic_stratos_refresh_24),
-                                        contentDescription = stringResource(R.string.stratos_refresh),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.size(20.dp),
                                     )
                                 }
                             }
@@ -171,100 +175,117 @@ fun StratosHomeScreen(
                     )
                 },
             ) { innerPadding ->
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                        .padding(innerPadding),
                 ) {
-                    // --- country / dns selectors --------------------------------------
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .widthIn(max = 680.dp)
+                            .align(Alignment.TopCenter)
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        StratosSelectorChip(
-                            icon = R.drawable.ic_stratos_globe_24,
-                            label = state.selectedServerRemark.ifBlank {
-                                stringResource(R.string.stratos_servers_title)
-                            },
-                            subtitle = state.selectedServerCountry.uppercase()
-                                .ifBlank { "—" },
-                            onClick = onOpenServers,
-                            modifier = Modifier.weight(1f),
-                            contentDescription = stringResource(R.string.stratos_servers_title),
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            StratosSelectorChip(
+                                icon = R.drawable.ic_stratos_globe_24,
+                                label = state.selectedServerRemark.ifBlank {
+                                    stringResource(R.string.stratos_servers_title)
+                                },
+                                subtitle = state.selectedServerCountry.uppercase()
+                                    .ifBlank { stringResource(R.string.stratos_ip_unavailable) },
+                                onClick = onOpenServers,
+                                modifier = Modifier.weight(1.35f),
+                                contentDescription = stringResource(R.string.stratos_servers_title),
+                            )
+                            StratosSelectorChip(
+                                icon = R.drawable.ic_stratos_shield_24,
+                                label = dnsLabel(state.dnsPresetId),
+                                subtitle = stringResource(R.string.stratos_dns_title),
+                                onClick = onOpenDns,
+                                modifier = Modifier.weight(1f),
+                                contentDescription = stringResource(R.string.stratos_dns_title),
+                            )
+                        }
+
+                        Spacer(Modifier.height(14.dp))
+
+                        StratosConnectRing(
+                            state = state,
+                            onToggle = { onAction(StratosHomeAction.ToggleConnect) },
                         )
-                        StratosSelectorChip(
-                            icon = R.drawable.ic_stratos_shield_24,
-                            label = dnsLabel(state.dnsPresetId),
-                            subtitle = "DNS",
-                            onClick = onOpenDns,
-                            modifier = Modifier.weight(1f),
-                            contentDescription = stringResource(R.string.stratos_dns_title),
-                        )
+
+                        Spacer(Modifier.height(14.dp))
+
+                        StratosGlassCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(20.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            ) {
+                                StratosInfoCard(
+                                    title = stringResource(R.string.stratos_ip_current),
+                                    value = when {
+                                        state.ipLocalLoading -> stringResource(R.string.stratos_ip_loading)
+                                        state.ipLocal.isBlank() -> stringResource(R.string.stratos_ip_unavailable)
+                                        else -> state.ipLocal
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .padding(top = 7.dp)
+                                        .width(1.dp)
+                                        .height(36.dp)
+                                        .background(
+                                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
+                                            RoundedCornerShape(50),
+                                        ),
+                                )
+                                StratosInfoCard(
+                                    title = stringResource(R.string.stratos_ip_after),
+                                    value = when {
+                                        state.connectState == StratosConnectState.Connected ->
+                                            state.ipVpn.ifBlank { stringResource(R.string.stratos_ip_loading) }
+
+                                        else -> stringResource(R.string.stratos_ip_unavailable)
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    accent = state.connectState == StratosConnectState.Connected,
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(14.dp))
+
+                        when {
+                            state.isExpired -> StratosExpiredPanel(
+                                reason = state.blockedReason,
+                                isSyncing = state.isSyncing,
+                                onRefresh = { onAction(StratosHomeAction.Refresh) },
+                                onRenew = onOpenRenew,
+                            )
+
+                            state.connectState == StratosConnectState.Connected -> StratosLivePanel(state = state)
+
+                            else -> StratosPlanPanel(state = state)
+                        }
+
+                        Spacer(Modifier.height(26.dp))
                     }
-
-                    Spacer(Modifier.height(18.dp))
-
-                    // --- connect ring ---------------------------------------------------
-                    StratosConnectRing(
-                        state = state,
-                        onToggle = { onAction(StratosHomeAction.ToggleConnect) },
-                    )
-
-                    Spacer(Modifier.height(14.dp))
-
-                    // --- IP cards --------------------------------------------------------
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        StratosInfoCard(
-                            title = stringResource(R.string.stratos_ip_current),
-                            value = when {
-                                state.ipLocalLoading -> stringResource(R.string.stratos_ip_loading)
-                                state.ipLocal.isBlank() -> stringResource(R.string.stratos_ip_unavailable)
-                                else -> state.ipLocal
-                            },
-                            modifier = Modifier.weight(1f),
-                        )
-                        StratosInfoCard(
-                            title = stringResource(R.string.stratos_ip_after),
-                            value = when {
-                                state.connectState == StratosConnectState.Connected ->
-                                    state.ipVpn.ifBlank { stringResource(R.string.stratos_ip_loading) }
-
-                                else -> stringResource(R.string.stratos_ip_unavailable)
-                            },
-                            modifier = Modifier.weight(1f),
-                            accent = state.connectState == StratosConnectState.Connected,
-                        )
-                    }
-
-                    Spacer(Modifier.height(14.dp))
-
-                    // --- bottom info panel ------------------------------------------------
-                    when {
-                        state.isExpired -> StratosExpiredPanel(
-                            reason = state.blockedReason,
-                            isSyncing = state.isSyncing,
-                            onRefresh = { onAction(StratosHomeAction.Refresh) },
-                            onRenew = onOpenRenew,
-                        )
-
-                        state.connectState == StratosConnectState.Connected -> StratosLivePanel(state = state)
-
-                        else -> StratosPlanPanel(state = state)
-                    }
-
-                    Spacer(Modifier.height(24.dp))
                 }
             }
         }
     }
 
-    // --- dialogs ---------------------------------------------------------------------
     if (state.showChangePassword) {
         StratosChangePasswordDialog(
             busy = state.passwordChangeBusy,
@@ -325,40 +346,54 @@ private fun dnsLabel(presetId: String): String = when (presetId) {
 @Composable
 private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) {
     val connected = state.connectState == StratosConnectState.Connected
-    val connecting = state.connectState == StratosConnectState.Connecting
+    val transitioning = state.connectState == StratosConnectState.Connecting ||
+            state.connectState == StratosConnectState.Stopping
 
     val animatedFraction by animateFloatAsState(
         targetValue = state.remainingFraction.coerceIn(0f, 1f),
-        animationSpec = tween(700),
+        animationSpec = tween(900),
         label = "ring",
     )
     val glowPulse by rememberInfiniteTransition(label = "pulse").animateFloat(
-        initialValue = 0.85f,
+        initialValue = 0.72f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(1600, easing = LinearEasing), RepeatMode.Reverse),
+        animationSpec = infiniteRepeatable(tween(1800, easing = LinearEasing), RepeatMode.Reverse),
         label = "glow",
     )
+    val connectDescription = stringResource(
+        if (connected) R.string.stratos_disconnect else R.string.stratos_connect,
+    )
+    val ringTrackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.42f)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        val connectDesc = stringResource(
-            if (connected) R.string.stratos_disconnect else R.string.stratos_connect,
-        )
         Box(
-            modifier = Modifier
-                .size(230.dp)
-                .semantics { contentDescription = connectDesc; role = Role.Button },
+            modifier = Modifier.size(252.dp),
             contentAlignment = Alignment.Center,
         ) {
             Canvas(Modifier.fillMaxSize()) {
-                val stroke = 11.dp.toPx()
-                val inset = stroke / 2 + 2.dp.toPx()
+                val center = Offset(size.width / 2f, size.height / 2f)
+                val aura = if (connected) StratosColors.Cyan else StratosColors.Indigo
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            aura.copy(alpha = (if (connected) 0.20f else 0.11f) * glowPulse),
+                            Color.Transparent,
+                        ),
+                        center = center,
+                        radius = size.minDimension * 0.50f,
+                    ),
+                    center = center,
+                    radius = size.minDimension * 0.50f,
+                )
+
+                val stroke = 10.dp.toPx()
+                val inset = 14.dp.toPx()
                 val diameter = size.minDimension - inset * 2
                 val topLeft = Offset((size.width - diameter) / 2, (size.height - diameter) / 2)
                 val arcSize = Size(diameter, diameter)
 
-                // track ring
                 drawArc(
-                    color = StratosColors.Indigo.copy(alpha = 0.16f),
+                    color = ringTrackColor,
                     startAngle = -90f,
                     sweepAngle = 360f,
                     useCenter = false,
@@ -366,15 +401,15 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
                     size = arcSize,
                     style = Stroke(width = stroke, cap = StrokeCap.Round),
                 )
-                // remaining-data arc
-                val ringColor = when {
-                    state.isExpired -> StratosColors.Danger
-                    animatedFraction > 0.35f -> StratosColors.Cyan
-                    else -> StratosColors.Warning
-                }
                 drawArc(
-                    color = ringColor.copy(
-                        alpha = if (connected) glowPulse else 1f,
+                    brush = Brush.sweepGradient(
+                        listOf(
+                            StratosColors.Cyan,
+                            StratosColors.Sky,
+                            StratosColors.Indigo,
+                            StratosColors.Cyan,
+                        ),
+                        center = center,
                     ),
                     startAngle = -90f,
                     sweepAngle = 360f * animatedFraction,
@@ -382,61 +417,106 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
                     topLeft = topLeft,
                     size = arcSize,
                     style = Stroke(width = stroke, cap = StrokeCap.Round),
+                    alpha = if (connected) glowPulse else 0.92f,
+                )
+
+                drawArc(
+                    color = StratosColors.SoftIndigo.copy(alpha = 0.20f),
+                    startAngle = 206f,
+                    sweepAngle = 118f,
+                    useCenter = false,
+                    topLeft = Offset(2.dp.toPx(), 2.dp.toPx()),
+                    size = Size(size.width - 4.dp.toPx(), size.height - 4.dp.toPx()),
+                    style = Stroke(width = 1.dp.toPx()),
+                )
+                val satelliteAngle = Math.toRadians(324.0)
+                val orbitRadius = size.minDimension / 2f - 2.dp.toPx()
+                drawCircle(
+                    color = StratosColors.Cyan.copy(alpha = 0.86f),
+                    radius = 2.6.dp.toPx(),
+                    center = Offset(
+                        center.x + kotlin.math.cos(satelliteAngle).toFloat() * orbitRadius,
+                        center.y + kotlin.math.sin(satelliteAngle).toFloat() * orbitRadius,
+                    ),
                 )
             }
 
-            // inner button
             val buttonBrush = when {
-                connected -> Brush.verticalGradient(StratosColors.BrandGradient)
-                connecting -> Brush.verticalGradient(
-                    listOf(StratosColors.Indigo, StratosColors.Indigo.copy(alpha = 0.72f)),
+                connected -> Brush.linearGradient(
+                    listOf(
+                        StratosColors.Cyan,
+                        StratosColors.Sky,
+                        StratosColors.Indigo,
+                    ),
                 )
 
-                else -> Brush.verticalGradient(
+                transitioning -> Brush.linearGradient(
+                    listOf(StratosColors.Indigo, StratosColors.Aurora),
+                )
+
+                else -> Brush.linearGradient(
                     listOf(
-                        MaterialTheme.colorScheme.surfaceVariant,
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                        MaterialTheme.colorScheme.surfaceContainerHighest,
+                        MaterialTheme.colorScheme.surfaceContainer,
                     ),
                 )
             }
             Box(
                 modifier = Modifier
-                    .size(178.dp)
-                    .clip(CircleShape)
-                    .background(buttonBrush)
-                    .clickable(enabled = !connecting, onClick = onToggle)
-                    .semantics { role = Role.Button },
+                    .size(184.dp)
+                    .background(buttonBrush, CircleShape)
+                    .border(
+                        1.dp,
+                        Color.White.copy(alpha = if (connected) 0.30f else 0.10f),
+                        CircleShape,
+                    )
+                    .clickable(
+                        enabled = !transitioning,
+                        role = Role.Button,
+                        onClick = onToggle,
+                    )
+                    .semantics(mergeDescendants = true) {
+                        contentDescription = connectDescription
+                        role = Role.Button
+                    },
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    if (connecting) {
+                    if (transitioning) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(34.dp),
+                            modifier = Modifier.size(35.dp),
                             color = Color.White,
-                            strokeWidth = 2.6.dp,
+                            strokeWidth = 2.5.dp,
                         )
                     } else {
-                        Icon(
-                            painterResource(R.drawable.ic_stratos_power_24),
-                            contentDescription = null,
-                            tint = if (connected) Color.White
-                            else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(44.dp),
-                        )
+                        Surface(
+                            color = if (connected) Color.White.copy(alpha = 0.16f)
+                            else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.78f),
+                            shape = CircleShape,
+                            modifier = Modifier.size(61.dp),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    painterResource(R.drawable.ic_stratos_power_24),
+                                    contentDescription = null,
+                                    tint = if (connected) Color.White else MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(31.dp),
+                                )
+                            }
+                        }
                     }
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(9.dp))
                     Text(
                         text = stringResource(statusLabel(state.connectState)),
-                        color = if (connected || connecting) Color.White
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (connected || transitioning) Color.White
+                        else MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
         }
 
-        Spacer(Modifier.height(4.dp))
         Text(
             text = when {
                 state.isExpired -> stringResource(R.string.stratos_expired_title)
@@ -444,7 +524,8 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
                 else -> stringResource(R.string.stratos_tap_to_connect)
             },
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Medium,
+            color = if (connected) StratosColors.Cyan else MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -472,36 +553,45 @@ private fun StratosSelectorChip(
     modifier: Modifier = Modifier,
     contentDescription: String,
 ) {
-    Card(
+    StratosGlassCard(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .semantics { this.contentDescription = contentDescription; role = Role.Button },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.6f),
-        ),
-        shape = RoundedCornerShape(16.dp),
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics(mergeDescendants = true) {
+                this.contentDescription = contentDescription
+                role = Role.Button
+            },
+        shape = RoundedCornerShape(20.dp),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = 13.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                painterResource(icon),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.size(20.dp),
-            )
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = StratosColors.Cyan.copy(alpha = 0.11f),
+                modifier = Modifier.size(38.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        painterResource(icon),
+                        contentDescription = null,
+                        tint = StratosColors.Cyan,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(
                     label,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                Spacer(Modifier.height(1.dp))
                 Text(
                     subtitle,
                     style = MaterialTheme.typography.labelSmall,
@@ -520,30 +610,23 @@ private fun StratosInfoCard(
     modifier: Modifier = Modifier,
     accent: Boolean = false,
 ) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.6f),
-        ),
-        shape = RoundedCornerShape(16.dp),
+    Column(
+        modifier = modifier.padding(horizontal = 8.dp, vertical = 6.dp),
     ) {
-        Column(Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-            Text(
-                title,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                value,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = if (accent) MaterialTheme.colorScheme.secondary
-                else MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
+        Text(
+            title,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(3.dp))
+        Text(
+            value,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = if (accent) StratosColors.Cyan else MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -553,25 +636,30 @@ private fun StratosInfoCard(
 
 @Composable
 private fun StratosPlanPanel(state: StratosHomeUiState) {
-    Card(
+    StratosGlassCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.75f),
-        ),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(17.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painterResource(R.drawable.ic_stratos_data_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp),
-                )
-                Spacer(Modifier.width(8.dp))
+                Surface(
+                    color = StratosColors.Cyan.copy(alpha = 0.12f),
+                    shape = RoundedCornerShape(11.dp),
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painterResource(R.drawable.ic_stratos_data_24),
+                            contentDescription = null,
+                            tint = StratosColors.Cyan,
+                            modifier = Modifier.size(19.dp),
+                        )
+                    }
+                }
+                Spacer(Modifier.width(10.dp))
                 Text(
                     stringResource(R.string.stratos_data_remaining),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.weight(1f))
@@ -579,26 +667,20 @@ private fun StratosPlanPanel(state: StratosHomeUiState) {
                     text = if (state.isUnlimitedData) stringResource(R.string.stratos_unlimited)
                     else state.remainingBytes.toTrafficString(),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = StratosColors.Cyan,
                 )
             }
-            Spacer(Modifier.height(10.dp))
-            LinearProgressIndicator(
-                progress = { state.remainingFraction },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
-                    .clip(RoundedCornerShape(3.dp)),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(13.dp))
+            StratosGradientProgress(state.remainingFraction)
+            Spacer(Modifier.height(16.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.42f))
+            Spacer(Modifier.height(13.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painterResource(R.drawable.ic_stratos_clock_24),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary,
+                    tint = StratosColors.SoftIndigo,
                     modifier = Modifier.size(18.dp),
                 )
                 Spacer(Modifier.width(8.dp))
@@ -612,11 +694,31 @@ private fun StratosPlanPanel(state: StratosHomeUiState) {
                     text = if (state.remainingDays == Long.MAX_VALUE) stringResource(R.string.stratos_unlimited)
                     else "${state.remainingDays} " + stringResource(R.string.stratos_days),
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                    color = StratosColors.SoftIndigo,
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun StratosGradientProgress(progress: Float) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(7.dp)
+            .background(
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f),
+                RoundedCornerShape(50),
+            ),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(progress.coerceIn(0f, 1f))
+                .height(7.dp)
+                .background(StratosColors.PremiumGradient, RoundedCornerShape(50)),
+        )
     }
 }
 
@@ -627,36 +729,56 @@ private fun StratosExpiredPanel(
     onRefresh: () -> Unit,
     onRenew: () -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f),
-        ),
-        shape = RoundedCornerShape(20.dp),
+    StratosGlassCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.error.copy(alpha = 0.24f),
+                RoundedCornerShape(24.dp),
+            ),
+        shape = RoundedCornerShape(24.dp),
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(
-                    if (reason == StratosSession.BLOCKED_NO_DATA) R.string.stratos_expired_data
-                    else R.string.stratos_expired_title,
-                ),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.error,
-            )
-            Spacer(Modifier.height(6.dp))
+        Column(Modifier.padding(17.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
+                    shape = CircleShape,
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painterResource(R.drawable.ic_stratos_info_24),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(19.dp),
+                        )
+                    }
+                }
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    text = stringResource(
+                        if (reason == StratosSession.BLOCKED_NO_DATA) R.string.stratos_expired_data
+                        else R.string.stratos_expired_title,
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+            Spacer(Modifier.height(8.dp))
             Text(
                 stringResource(R.string.stratos_expired_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(15.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedButton(
                     onClick = onRefresh,
                     enabled = !isSyncing,
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(14.dp),
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_stratos_refresh_24),
@@ -669,7 +791,7 @@ private fun StratosExpiredPanel(
                 FilledTonalButton(
                     onClick = onRenew,
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(14.dp),
                 ) {
                     Icon(
                         painterResource(R.drawable.ic_stratos_renew_24),
@@ -686,14 +808,11 @@ private fun StratosExpiredPanel(
 
 @Composable
 private fun StratosLivePanel(state: StratosHomeUiState) {
-    Card(
+    StratosGlassCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.75f),
-        ),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(17.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 StratosSpeedItem(
                     icon = R.drawable.ic_stratos_download_24,
@@ -866,33 +985,51 @@ private fun StratosDrawer(
     onAbout: () -> Unit,
     onLogout: () -> Unit,
 ) {
-    ModalDrawerSheet {
+    ModalDrawerSheet(
+        drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
         Column(
             Modifier
-                .width(300.dp)
+                .width(310.dp)
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            StratosColors.Indigo.copy(alpha = 0.10f),
+                            Color.Transparent,
+                            StratosColors.Cyan.copy(alpha = 0.05f),
+                        ),
+                    ),
+                )
                 .padding(horizontal = 14.dp, vertical = 20.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                StratosLogo(44.dp, contentDescription = null)
-                Spacer(Modifier.width(12.dp))
-                Column {
-                    Text(
-                        stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        stringResource(R.string.stratos_signed_in_as, state.username),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+            StratosGlassCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    StratosLogo(46.dp, contentDescription = null)
+                    Spacer(Modifier.width(11.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+                        Text(
+                            stringResource(R.string.stratos_signed_in_as, state.username),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
-            Spacer(Modifier.height(18.dp))
-            HorizontalDivider()
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(16.dp))
 
             StratosDrawerItem(R.drawable.ic_stratos_renew_24, R.string.stratos_menu_renew, onRenew)
             StratosDrawerItem(R.drawable.ic_stratos_key_24, R.string.stratos_menu_change_password, onChangePassword)
@@ -902,8 +1039,8 @@ private fun StratosDrawer(
             StratosDrawerItem(R.drawable.ic_stratos_info_24, R.string.stratos_menu_about, onAbout)
 
             Spacer(Modifier.weight(1f))
-            HorizontalDivider()
-            Spacer(Modifier.height(10.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f))
+            Spacer(Modifier.height(8.dp))
             StratosDrawerItem(
                 R.drawable.ic_stratos_logout_24,
                 R.string.stratos_menu_logout,
@@ -914,7 +1051,7 @@ private fun StratosDrawer(
             Text(
                 stringResource(R.string.stratos_version, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.68f),
                 modifier = Modifier.padding(horizontal = 12.dp),
             )
         }

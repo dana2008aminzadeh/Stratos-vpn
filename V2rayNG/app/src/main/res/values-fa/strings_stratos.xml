@@ -112,4 +112,12 @@
     <string name="stratos_kicked_title">خارج شدید</string>
     <string name="stratos_kicked_message">حساب شما روی دستگاه دیگری وارد شده یا نشست شما پایان یافته است.</string>
     <string name="stratos_notice_title">اطلاعیه</string>
+
+    <!-- Stratos premium UI -->
+    <string name="stratos_show_password">نمایش رمز عبور</string>
+    <string name="stratos_hide_password">پنهان کردن رمز عبور</string>
+    <string name="stratos_server_count">%1$d سرور</string>
+    <string name="stratos_expanded">باز شده</string>
+    <string name="stratos_collapsed">بسته شده</string>
+    <string name="stratos_powered_by">قدرت‌گرفته از v2rayNG • GPLv3</string>
 </resources>

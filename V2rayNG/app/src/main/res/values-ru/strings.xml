@@ -565,4 +565,12 @@
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
 
+
+    <!-- Stratos premium UI -->
+    <string name="stratos_show_password">Показать пароль</string>
+    <string name="stratos_hide_password">Скрыть пароль</string>
+    <string name="stratos_server_count">Серверов: %1$d</string>
+    <string name="stratos_expanded">Развёрнуто</string>
+    <string name="stratos_collapsed">Свёрнуто</string>
+    <string name="stratos_powered_by">На базе v2rayNG • GPLv3</string>
 </resources>

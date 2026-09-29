@@ -559,4 +559,12 @@
     <string name="connection_test_empty_message">无详细信息</string>
     <string name="value_unknown">未知</string>
 
+
+    <!-- Stratos premium UI -->
+    <string name="stratos_show_password">显示密码</string>
+    <string name="stratos_hide_password">隐藏密码</string>
+    <string name="stratos_server_count">%1$d 台服务器</string>
+    <string name="stratos_expanded">已展开</string>
+    <string name="stratos_collapsed">已折叠</string>
+    <string name="stratos_powered_by">基于 v2rayNG • GPLv3</string>
 </resources>
