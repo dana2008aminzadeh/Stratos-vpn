@@ -17,7 +17,8 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.helper.NotificationHelper
-import com.v2ray.ang.ui.main.MainActivity
+import com.v2ray.ang.stratos.StratosTrafficEngine
+import com.v2ray.ang.ui.stratos.StratosHomeActivity
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +45,8 @@ object NotificationManager {
      * @param currentConfig The current profile configuration.
      */
     fun startSpeedNotification() {
-        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SPEED_ENABLED) != true) return
+        // Stratos VPN: the live-traffic notification is mandatory; it also feeds
+        // the local usage accounting, so the loop must always run while connected.
         if (speedNotificationJob != null || CoreServiceManager.isRunning() == false) return
 
         var lastZeroSpeed = false
@@ -69,7 +71,8 @@ object NotificationManager {
 
         val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
-        val startMainIntent = Intent(service, MainActivity::class.java)
+        val startMainIntent = Intent(service, StratosHomeActivity::class.java)
+        startMainIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         val contentPendingIntent = PendingIntent.getActivity(service, NOTIFICATION_PENDING_INTENT_CONTENT, startMainIntent, flags)
 
         val stopV2RayIntent = Intent(AppConfig.BROADCAST_ACTION_SERVICE)
@@ -113,6 +116,9 @@ object NotificationManager {
         //mBuilder?.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE)
 
         service.startForeground(NOTIFICATION_ID, mBuilder?.build())
+
+        // Stratos VPN: reset per-connection accounting whenever a connection starts.
+        StratosTrafficEngine.onCoreStarted(service)
     }
 
     /**
@@ -131,6 +137,10 @@ object NotificationManager {
      */
     fun cancelNotification() {
         val service = getService() ?: return
+
+        // Stratos VPN: flush pending usage reporting before the foreground contract ends.
+        StratosTrafficEngine.onCoreStopped(service)
+
         service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
 
         mBuilder = null
@@ -265,6 +275,18 @@ object NotificationManager {
 
         val proxyTotal = proxyUplink + proxyDownlink
         val directTotal = directUplink + directDownlink
+
+        // Stratos VPN: feed cumulative proxy counters into the local usage accounting
+        // and quota gate (disconnects immediately when volume/time is exhausted).
+        getService()?.let { service ->
+            StratosTrafficEngine.onTrafficSample(
+                context = service,
+                proxyUp = proxyUplink,
+                proxyDown = proxyDownlink,
+                sinceLastQueryMs = sinceLastQueryIn,
+            )
+        }
+
         val zeroSpeed = proxyTotal + directTotal == 0L
         if (!zeroSpeed || !lastZeroSpeed) {
             val text = StringBuilder()

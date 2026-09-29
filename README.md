@@ -1,3 +1,11 @@
+# Stratos VPN
+
+**Beyond the sky** — a fully branded, account-based VPN client (fork of v2rayNG).
+
+👉 See **[STRATOS.md](STRATOS.md)** for the product overview and **[docs/STRATOS_API.md](docs/STRATOS_API.md)** for the panel API contract.
+
+---
+
 # v2rayNG
 
 A V2Ray client for Android, support [Xray core](https://github.com/XTLS/Xray-core) and [v2fly core](https://github.com/v2fly/v2ray-core)

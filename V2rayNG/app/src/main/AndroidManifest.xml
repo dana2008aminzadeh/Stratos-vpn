@@ -61,8 +61,9 @@
                 android:value="true" />
         </service>
 
+        <!-- Stratos VPN entry point: login first, home after a valid session -->
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.stratos.StratosLoginActivity"
             android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
@@ -71,14 +72,39 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-            </intent-filter>
 
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
+        <activity
+            android:name=".ui.stratos.StratosHomeActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.stratos.StratosServersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.stratos.StratosDnsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.stratos.StratosSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.stratos.StratosAboutActivity"
+            android:exported="false" />
+
+        <!-- Classic v2rayNG UI stays available (advanced mode), but not as an entry point -->
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.server.ServerVmessActivity"
             android:exported="false"

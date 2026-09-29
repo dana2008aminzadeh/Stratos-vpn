@@ -199,6 +199,10 @@ object AppConfig {
     const val MSG_SUB_UPDATE_START = 8
     const val MSG_SUB_UPDATE_CANCEL = 81
 
+    // Stratos VPN real-time traffic/account events (service -> UI)
+    const val MSG_STRATOS_TRAFFIC = 91
+    const val MSG_STRATOS_BLOCKED = 92
+
     /** Notification channel IDs and names. */
     // Use a new ID because Android does not let an app raise an existing channel's importance.
     const val RAY_NG_CHANNEL_ID = "CORE_M_CH_ID_V2"
