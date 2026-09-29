@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stratos VPN brand mark (transparent background) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <group android:rotation="-20" android:pivotX="48" android:pivotY="48">
+        <path
+            android:pathData="M76.4,48 A28.4,11.1 0 1 1 19.6,48 A28.4,11.1 0 1 1 76.4,48"
+            android:strokeColor="#22D3EE"
+            android:strokeWidth="2.2"
+            android:strokeLineCap="round"  android:fillColor="#00000000" />
+    </group>
+    <path android:pathData="M48,32.9a15.1,15.1 0 1,1 -0.02,0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="35.6" android:startY="35.6" android:endX="61.3" android:endY="61.3">
+                <item android:offset="0" android:color="#FF38BDF8" />
+                <item android:offset="1" android:color="#FF6366F1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <group android:rotation="-20" android:pivotX="48" android:pivotY="48">
+        <path
+            android:pathData="M76.4,48 A28.4,11.1 0 0 1 19.6,48"
+            android:strokeColor="#38BDF8"
+            android:strokeWidth="2.3"
+            android:strokeLineCap="round"  android:fillColor="#00000000" />
+    </group>
+    <path android:pathData="M24.5,60.8m-2.8,0a2.8,2.8 0 1,1 5.6,0a2.8,2.8 0 1,1 -5.6,0" android:fillColor="#F0F4FF" />
+    <path android:pathData="M19.2,24.9m-1.0,0a1.0,1.0 0 1,1 2.0,0a1.0,1.0 0 1,1 -2.0,0" android:fillColor="#C8DCFF" />
+    <path android:pathData="M76.8,21.1m-0.8,0a0.8,0.8 0 1,1 1.6,0a0.8,0.8 0 1,1 -1.6,0" android:fillColor="#C8DCFF" />
+    <path android:pathData="M69.1,76.8m-0.9,0a0.9,0.9 0 1,1 1.8,0a0.9,0.9 0 1,1 -1.8,0" android:fillColor="#C8DCFF" />
+</vector>

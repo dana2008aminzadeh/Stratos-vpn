@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stratos VPN UI strings (Persian) -->
+<resources>
+    <!-- Brand / login -->
+    <string name="stratos_tagline">فراتر از آسمان</string>
+    <string name="stratos_login_title">به استراتوس خوش آمدید</string>
+    <string name="stratos_login_subtitle">برای ادامه با حساب کاربری خود وارد شوید</string>
+    <string name="stratos_username">نام کاربری</string>
+    <string name="stratos_password">رمز عبور</string>
+    <string name="stratos_login">ورود</string>
+    <string name="stratos_login_with_qr">ورود با QR کد</string>
+    <string name="stratos_qr_login_hint">کد QR ورودی که نماینده فروش به شما داده را اسکن کنید</string>
+    <string name="stratos_error_username_format">نام کاربری باید با «fyx» شروع شود و بین ۴ تا ۸ کاراکتر باشد</string>
+    <string name="stratos_error_password_format">رمز عبور باید بین ۵ تا ۱۰ کاراکتر باشد</string>
+    <string name="stratos_error_invalid_credentials">نام کاربری یا رمز عبور اشتباه است</string>
+    <string name="stratos_error_device_conflict">این حساب روی دستگاه دیگری فعال است. ابتدا در آن دستگاه خارج شوید.</string>
+    <string name="stratos_error_network">اتصال برقرار نشد. اینترنت خود را بررسی کرده و دوباره تلاش کنید.</string>
+    <string name="stratos_logging_in">در حال ورود…</string>
+
+    <!-- Home / connection -->
+    <string name="stratos_connect">اتصال</string>
+    <string name="stratos_disconnect">قطع اتصال</string>
+    <string name="stratos_connecting">در حال اتصال…</string>
+    <string name="stratos_disconnecting">در حال قطع اتصال…</string>
+    <string name="stratos_connected">متصل</string>
+    <string name="stratos_disconnected">قطع</string>
+    <string name="stratos_tap_to_connect">برای اتصال لمس کنید</string>
+    <string name="stratos_auto_connect">اتصال خودکار</string>
+    <string name="stratos_auto_connecting">در حال یافتن سریع‌ترین سرور…</string>
+    <string name="stratos_ip_current">IP شما</string>
+    <string name="stratos_ip_after">IP پس از اتصال</string>
+    <string name="stratos_ip_loading">در حال بررسی…</string>
+    <string name="stratos_ip_unavailable">—</string>
+
+    <!-- Subscription box -->
+    <string name="stratos_data_remaining">حجم باقی‌مانده</string>
+    <string name="stratos_time_remaining">زمان باقی‌مانده</string>
+    <string name="stratos_days">روز</string>
+    <string name="stratos_unlimited">نامحدود</string>
+    <string name="stratos_expired_title">اشتراک شما پایان یافته است</string>
+    <string name="stratos_expired_data">حجم شما به پایان رسیده است</string>
+    <string name="stratos_expired_hint">برای اتصال مجدد اشتراک خود را تمدید کنید. همچنان می‌توانید سرورها را به‌روزرسانی و پینگ بگیرید.</string>
+    <string name="stratos_expired_cannot_connect">امکان اتصال وجود ندارد: اشتراک شما غیرفعال است.</string>
+    <string name="stratos_refresh">به‌روزرسانی</string>
+    <string name="stratos_renew">تمدید اشتراک</string>
+    <string name="stratos_syncing">در حال به‌روزرسانی…</string>
+
+    <!-- Connected stats -->
+    <string name="stratos_download">دانلود</string>
+    <string name="stratos_upload">آپلود</string>
+    <string name="stratos_total_used">مصرف کل</string>
+    <string name="stratos_session_time">زمان اتصال</string>
+    <string name="stratos_session_traffic">ترافیک این نشست</string>
+
+    <!-- Servers -->
+    <string name="stratos_servers_title">سرورها</string>
+    <string name="stratos_test_all_ping">پینگ همه</string>
+    <string name="stratos_pinging">در حال تست…</string>
+    <string name="stratos_no_servers">سروری موجود نیست. برای به‌روزرسانی بکشید.</string>
+    <string name="stratos_ms_unit">میلی‌ثانیه</string>
+    <string name="stratos_ping_timeout">بدون پاسخ</string>
+    <string name="stratos_selected">انتخاب شده</string>
+
+    <!-- DNS -->
+    <string name="stratos_dns_title">DNS</string>
+    <string name="stratos_dns_default">پیش‌فرض</string>
+    <string name="stratos_dns_default_desc">DNS استاندارد سرویس‌دهنده</string>
+    <string name="stratos_dns_ads">مسدودسازی تبلیغات</string>
+    <string name="stratos_dns_ads_desc">حذف تبلیغات و ردیاب‌ها</string>
+    <string name="stratos_dns_family">مناسب کودک</string>
+    <string name="stratos_dns_family_desc">مسدودسازی محتوای نامناسب و بزرگسال</string>
+    <string name="stratos_dns_gaming">گیمینگ</string>
+    <string name="stratos_dns_gaming_desc">بهینه‌شده برای پاسخ‌گویی سریع در بازی</string>
+    <string name="stratos_dns_applied">DNS اعمال شد. برای اثر کامل دوباره متصل شوید.</string>
+
+    <!-- Drawer -->
+    <string name="stratos_menu_renew">تمدید حساب</string>
+    <string name="stratos_menu_change_password">تغییر رمز عبور</string>
+    <string name="stratos_menu_settings">تنظیمات</string>
+    <string name="stratos_menu_website">وب‌سایت</string>
+    <string name="stratos_menu_telegram">تلگرام</string>
+    <string name="stratos_menu_about">درباره ما</string>
+    <string name="stratos_menu_logout">خروج</string>
+    <string name="stratos_version">نسخه %1$s</string>
+
+    <!-- Change password -->
+    <string name="stratos_change_password_title">تغییر رمز عبور</string>
+    <string name="stratos_current_password">رمز عبور فعلی</string>
+    <string name="stratos_new_password">رمز عبور جدید</string>
+    <string name="stratos_confirm">تأیید</string>
+    <string name="stratos_cancel">انصراف</string>
+    <string name="stratos_password_changed">رمز عبور با موفقیت تغییر کرد</string>
+    <string name="stratos_password_change_failed">تغییر رمز عبور انجام نشد</string>
+
+    <!-- Settings -->
+    <string name="stratos_settings_title">تنظیمات استراتوس</string>
+    <string name="stratos_settings_advanced">تنظیمات پیشرفته</string>
+    <string name="stratos_settings_advanced_desc">تنظیمات کامل موتور (شبکه محلی، IPv6، مسیریابی و…)</string>
+    <string name="stratos_settings_apply_best">اعمال تنظیمات بهینه</string>
+    <string name="stratos_settings_apply_best_desc">اعمال پیکربندی پیشنهادی سرویس‌دهنده</string>
+    <string name="stratos_settings_best_applied">تنظیمات بهینه اعمال شد</string>
+    <string name="stratos_language">زبان</string>
+
+    <!-- About -->
+    <string name="stratos_about_title">درباره استراتوس</string>
+    <string name="stratos_about_text">استراتوس یک کلاینت VPN امن، سریع و مینیمال است که بر پایهٔ موتور متن‌باز v2rayNG (GPLv3) ساخته شده است.</string>
+
+    <!-- Device / account -->
+    <string name="stratos_signed_in_as">وارد شده با حساب %1$s</string>
+    <string name="stratos_logout_confirm_title">خروج</string>
+    <string name="stratos_logout_confirm_message">از این دستگاه خارج می‌شوید؟ اتصال VPN قطع خواهد شد.</string>
+    <string name="stratos_kicked_title">خارج شدید</string>
+    <string name="stratos_kicked_message">حساب شما روی دستگاه دیگری وارد شده یا نشست شما پایان یافته است.</string>
+    <string name="stratos_notice_title">اطلاعیه</string>
+</resources>

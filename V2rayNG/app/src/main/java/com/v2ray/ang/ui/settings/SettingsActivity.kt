@@ -241,12 +241,8 @@ fun SettingsScreen(
                 onExpandedChange = { uiSettingsExpanded = it }
             )
             if (uiSettingsExpanded) {
-                SettingsSwitchItem(
-                    title = stringResource(R.string.title_pref_speed_enabled),
-                    summary = stringResource(R.string.summary_pref_speed_enabled),
-                    checked = speedEnabled,
-                    onCheckedChange = { speedEnabled = it }
-                )
+                // Stratos VPN: the live-traffic notification is mandatory and always on,
+                // so the speed-notification toggle is intentionally not exposed.
                 SettingsSwitchItem(
                     title = stringResource(R.string.title_pref_confirm_remove),
                     summary = stringResource(R.string.summary_pref_confirm_remove),

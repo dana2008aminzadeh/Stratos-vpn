@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stratos VPN brand palette -->
+<resources>
+    <color name="stratos_space_900">#060818</color>
+    <color name="stratos_space_800">#0B1026</color>
+    <color name="stratos_space_700">#11173A</color>
+    <color name="stratos_space_600">#1A224C</color>
+    <color name="stratos_indigo">#6366F1</color>
+    <color name="stratos_sky">#38BDF8</color>
+    <color name="stratos_cyan">#22D3EE</color>
+    <color name="stratos_success">#34D399</color>
+    <color name="stratos_warning">#FBBF24</color>
+    <color name="stratos_error">#F87171</color>
+    <color name="stratos_text_primary">#F0F4FF</color>
+    <color name="stratos_text_secondary">#9AA7C7</color>
+</resources>

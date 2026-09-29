@@ -47,5 +47,8 @@ class AngApplication : Application() {
 
         // Initialize theme state from MMKV
         ThemeManager.refresh()
+
+        // Stratos VPN branding/session layer (first-run defaults + panel sync)
+        com.v2ray.ang.stratos.StratosBootstrap.init(this)
     }
 }

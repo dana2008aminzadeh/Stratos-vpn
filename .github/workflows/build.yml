@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Stratos VPN APK
 
 on:
   workflow_dispatch:
@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - master
+      - 'arena/**'
 
 permissions:
   contents: write
@@ -52,7 +53,7 @@ jobs:
       if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
       run: |
         bash compile-hevtun.sh
-    
+
     - name: Save libhevtun
       if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v6
@@ -86,52 +87,74 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
-    - name: Decode Keystore
-      uses: timheuer/base64-to-file@v2.0.0
-      id: android_keystore
-      with:
-        fileName: "android_keystore.jks"
-        encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
+    - name: Prepare signing keystore
+      env:
+        KS_B64: ${{ secrets.APP_KEYSTORE_BASE64 }}
+        KS_PASS: ${{ secrets.APP_KEYSTORE_PASSWORD }}
+        KS_ALIAS: ${{ secrets.APP_KEYSTORE_ALIAS }}
+        KEY_PASS: ${{ secrets.APP_KEY_PASSWORD }}
+      run: |
+        if [ -n "$KS_B64" ]; then
+          echo "Using release keystore from secrets"
+          echo "$KS_B64" | base64 -d > android_keystore.jks
+          echo "KS_STORE_PASSWORD=$KS_PASS" >> $GITHUB_ENV
+          echo "KS_ALIAS=$KS_ALIAS" >> $GITHUB_ENV
+          echo "KS_KEY_PASSWORD=$KEY_PASS" >> $GITHUB_ENV
+        else
+          echo "No signing secrets configured - generating a temporary debug keystore"
+          keytool -genkeypair -v \
+            -keystore android_keystore.jks \
+            -alias stratos-debug -storepass stratos123 -keypass stratos123 \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Stratos VPN Debug, OU=Dev, O=Stratos, C=NL"
+          echo "KS_STORE_PASSWORD=stratos123" >> $GITHUB_ENV
+          echo "KS_ALIAS=stratos-debug" >> $GITHUB_ENV
+          echo "KS_KEY_PASSWORD=stratos123" >> $GITHUB_ENV
+          echo "DEBUG_KEYSTORE_USED=true" >> $GITHUB_ENV
+        fi
 
     - name: Build APK
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
-        ./gradlew licenseFdroidReleaseReport
-        ./gradlew assembleRelease -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
-    
+        ./gradlew assembleRelease \
+          -Pandroid.injected.signing.store.file=${{ github.workspace }}/android_keystore.jks \
+          -Pandroid.injected.signing.store.password=${{ env.KS_STORE_PASSWORD }} \
+          -Pandroid.injected.signing.key.alias=${{ env.KS_ALIAS }} \
+          -Pandroid.injected.signing.key.password=${{ env.KS_KEY_PASSWORD }}
+
     - name: Upload arm64-v8a APK
       uses: actions/upload-artifact@v7
-      if: ${{  success() }}
+      if: ${{ success() }}
       with:
-        name: arm64-v8a
+        name: StratosVPN-arm64-v8a
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*arm64-v8a*.apk
 
     - name: Upload armeabi-v7a APK
       uses: actions/upload-artifact@v7
-      if: ${{  success() }}
+      if: ${{ success() }}
       with:
-        name: armeabi-v7a
+        name: StratosVPN-armeabi-v7a
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*armeabi-v7a*.apk
 
-    - name: Upload x86 APK
+    - name: Upload x86_64 APK
       uses: actions/upload-artifact@v7
-      if: ${{  success() }}
+      if: ${{ success() }}
       with:
-        name: x86-apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*x86*.apk
+        name: StratosVPN-x86_64
+        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*x86_64*.apk
 
     - name: Upload universal APK
       uses: actions/upload-artifact@v7
       if: ${{ success() }}
       with:
-        name: universal-apk
+        name: StratosVPN-universal
         path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*universal*.apk
 
   sign-and-release:
     needs: build
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && inputs.release_tag != ''
 
     steps:
@@ -151,9 +174,7 @@ jobs:
             gpg --batch --yes --local-user "$KEY" --detach-sign --output "release-files/$(basename "$apk").sig" "$apk"
           done
 
-          gpg --armor --export "$KEY" > release-files/v2rayN-public-key.asc
-
-      - name: Upload APKs, signatures and public key to release
+      - name: Upload APKs and signatures to release
         uses: svenstaro/upload-release-action@v2
         with:
           file: release-files/*
