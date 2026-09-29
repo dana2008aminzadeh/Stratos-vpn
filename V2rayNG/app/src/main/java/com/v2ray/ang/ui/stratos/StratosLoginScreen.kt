@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.stratos
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +37,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -67,7 +72,7 @@ fun StratosLoginScreen(
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 22.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -77,33 +82,33 @@ fun StratosLoginScreen(
                     .widthIn(max = 480.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
                 StratosLoginMark()
                 Spacer(Modifier.height(18.dp))
                 Text(
                     text = stringResource(R.string.stratos_login_title),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = (-0.3).sp,
+                    letterSpacing = (-0.5).sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                 )
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(7.dp))
                 Text(
                     text = stringResource(R.string.stratos_login_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
-                Spacer(Modifier.height(26.dp))
+                Spacer(Modifier.height(28.dp))
 
                 StratosGlassCard(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(28.dp),
+                    shape = RoundedCornerShape(30.dp),
                 ) {
                     Column(
-                        Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(15.dp),
+                        Modifier.padding(22.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         OutlinedTextField(
                             value = state.username,
@@ -264,36 +269,69 @@ fun StratosLoginScreen(
 @Composable
 private fun StratosLoginMark() {
     Box(
-        modifier = Modifier
-            .size(116.dp)
-            .background(
-                brush = androidx.compose.ui.graphics.Brush.radialGradient(
-                    listOf(
-                        StratosColors.Cyan.copy(alpha = 0.18f),
-                        StratosColors.Indigo.copy(alpha = 0.08f),
-                        Color.Transparent,
-                    ),
-                ),
-                shape = CircleShape,
-            )
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.38f),
-                shape = CircleShape,
-            ),
+        modifier = Modifier.size(140.dp),
         contentAlignment = Alignment.Center,
     ) {
+        Canvas(Modifier.size(140.dp)) {
+            val center = Offset(size.width / 2f, size.height / 2f)
+            drawCircle(
+                brush = Brush.radialGradient(
+                    listOf(
+                        StratosColors.Cyan.copy(alpha = 0.20f),
+                        StratosColors.Indigo.copy(alpha = 0.10f),
+                        Color.Transparent,
+                    ),
+                    center = center,
+                    radius = size.minDimension * 0.50f,
+                ),
+                radius = size.minDimension * 0.50f,
+                center = center,
+            )
+            val inset = 7.dp.toPx()
+            drawArc(
+                color = StratosColors.Cyan.copy(alpha = 0.38f),
+                startAngle = 202f,
+                sweepAngle = 202f,
+                useCenter = false,
+                topLeft = Offset(inset, inset),
+                size = androidx.compose.ui.geometry.Size(size.width - inset * 2, size.height - inset * 2),
+                style = Stroke(width = 1.dp.toPx(), cap = StrokeCap.Round),
+            )
+            drawArc(
+                color = StratosColors.Gold.copy(alpha = 0.28f),
+                startAngle = 34f,
+                sweepAngle = 72f,
+                useCenter = false,
+                topLeft = Offset(inset, inset),
+                size = androidx.compose.ui.geometry.Size(size.width - inset * 2, size.height - inset * 2),
+                style = Stroke(width = 1.dp.toPx(), cap = StrokeCap.Round),
+            )
+            drawCircle(
+                color = StratosColors.Cyan.copy(alpha = 0.90f),
+                radius = 3.dp.toPx(),
+                center = Offset(size.width * 0.85f, size.height * 0.25f),
+            )
+        }
         Box(
             Modifier
-                .size(92.dp)
+                .size(108.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.88f),
+                            MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.56f),
+                        ),
+                    ),
+                    CircleShape,
+                )
                 .border(
                     width = 1.dp,
-                    color = StratosColors.Cyan.copy(alpha = 0.22f),
+                    color = Color.White.copy(alpha = 0.18f),
                     shape = CircleShape,
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            StratosLogo(88.dp, contentDescription = null)
+            StratosLogo(96.dp, contentDescription = null)
         }
     }
 }

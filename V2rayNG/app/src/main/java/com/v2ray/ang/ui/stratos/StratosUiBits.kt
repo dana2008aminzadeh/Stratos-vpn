@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,10 +23,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -44,13 +48,14 @@ import androidx.compose.ui.unit.sp
 import com.v2ray.ang.R
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 
-/** Stratos brand accents shared by all branded screens. */
+/** Visual tokens for the Stratos midnight-luxe design system. */
 object StratosColors {
     val Cyan = Color(0xFF27D7F2)
     val Sky = Color(0xFF49BFFB)
     val Indigo = Color(0xFF6D67F6)
     val SoftIndigo = Color(0xFF938BFF)
-    val Aurora = Color(0xFF8B5CF6)
+    val Aurora = Color(0xFFB17BFF)
+    val Gold = Color(0xFFFFD28A)
     val Success = Color(0xFF42E8B4)
     val Warning = Color(0xFFFFC857)
     val Danger = Color(0xFFFF758C)
@@ -64,29 +69,31 @@ object StratosColors {
     val PremiumGradient = Brush.linearGradient(
         colors = BrandGradient,
         start = Offset.Zero,
-        end = Offset(900f, 700f),
+        end = Offset(1100f, 740f),
     )
 }
 
 private val starPositions = listOf(
-    0.08f to 0.12f,
-    0.19f to 0.31f,
+    0.06f to 0.11f,
+    0.18f to 0.34f,
     0.31f to 0.08f,
-    0.46f to 0.20f,
-    0.64f to 0.11f,
-    0.83f to 0.25f,
-    0.93f to 0.07f,
-    0.11f to 0.57f,
-    0.28f to 0.71f,
-    0.72f to 0.61f,
-    0.89f to 0.78f,
-    0.53f to 0.88f,
+    0.45f to 0.22f,
+    0.63f to 0.10f,
+    0.82f to 0.26f,
+    0.94f to 0.07f,
+    0.10f to 0.56f,
+    0.27f to 0.72f,
+    0.43f to 0.59f,
+    0.71f to 0.61f,
+    0.88f to 0.77f,
+    0.54f to 0.89f,
     0.16f to 0.92f,
+    0.96f to 0.47f,
 )
 
 /**
- * Branded atmospheric background used by all Stratos screens. The orbital lines and stars are
- * intentionally low contrast so text and controls remain the visual focus in both themes.
+ * A layered night-sky canvas shared by branded screens. Its contrast is deliberately restrained:
+ * it gives every page depth without competing with controls or readable text.
  */
 @Composable
 fun StratosBackdrop(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
@@ -108,58 +115,97 @@ fun StratosBackdrop(modifier: Modifier = Modifier, content: @Composable BoxScope
             ),
     ) {
         Canvas(Modifier.fillMaxSize()) {
+            val darkGlow = if (dark) 1f else 0.56f
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(StratosColors.Indigo.copy(alpha = if (dark) 0.24f else 0.13f), Color.Transparent),
-                    center = Offset(size.width * 0.08f, size.height * 0.05f),
-                    radius = size.width * 0.92f,
+                    colors = listOf(
+                        StratosColors.Indigo.copy(alpha = 0.27f * darkGlow),
+                        StratosColors.Aurora.copy(alpha = 0.09f * darkGlow),
+                        Color.Transparent,
+                    ),
+                    center = Offset(size.width * 0.03f, size.height * 0.03f),
+                    radius = size.width * 0.96f,
                 ),
-                radius = size.width * 0.92f,
-                center = Offset(size.width * 0.08f, size.height * 0.05f),
+                radius = size.width * 0.96f,
+                center = Offset(size.width * 0.03f, size.height * 0.03f),
             )
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(StratosColors.Cyan.copy(alpha = if (dark) 0.15f else 0.10f), Color.Transparent),
-                    center = Offset(size.width * 0.95f, size.height * 0.68f),
-                    radius = size.width * 0.78f,
+                    colors = listOf(
+                        StratosColors.Cyan.copy(alpha = 0.17f * darkGlow),
+                        Color.Transparent,
+                    ),
+                    center = Offset(size.width * 1.02f, size.height * 0.62f),
+                    radius = size.width * 0.82f,
                 ),
-                radius = size.width * 0.78f,
-                center = Offset(size.width * 0.95f, size.height * 0.68f),
+                radius = size.width * 0.82f,
+                center = Offset(size.width * 1.02f, size.height * 0.62f),
+            )
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(StratosColors.Gold.copy(alpha = 0.055f * darkGlow), Color.Transparent),
+                    center = Offset(size.width * 0.52f, size.height * 0.98f),
+                    radius = size.width * 0.66f,
+                ),
+                radius = size.width * 0.66f,
+                center = Offset(size.width * 0.52f, size.height * 0.98f),
             )
 
-            val orbitSize = Size(size.width * 1.30f, size.width * 0.52f)
+            val primaryOrbit = Size(size.width * 1.38f, size.width * 0.56f)
             drawArc(
-                color = orbitColor.copy(alpha = if (dark) 0.10f else 0.07f),
+                color = orbitColor.copy(alpha = if (dark) 0.13f else 0.075f),
                 startAngle = 192f,
                 sweepAngle = 205f,
                 useCenter = false,
-                topLeft = Offset(-size.width * 0.15f, size.height * 0.17f),
-                size = orbitSize,
+                topLeft = Offset(-size.width * 0.18f, size.height * 0.15f),
+                size = primaryOrbit,
                 style = Stroke(width = 1.dp.toPx()),
             )
             drawArc(
-                color = StratosColors.Cyan.copy(alpha = if (dark) 0.08f else 0.06f),
-                startAngle = 12f,
+                color = StratosColors.Cyan.copy(alpha = if (dark) 0.10f else 0.065f),
+                startAngle = 14f,
                 sweepAngle = 190f,
                 useCenter = false,
-                topLeft = Offset(-size.width * 0.04f, size.height * 0.64f),
-                size = orbitSize,
+                topLeft = Offset(-size.width * 0.08f, size.height * 0.62f),
+                size = primaryOrbit,
+                style = Stroke(width = 1.dp.toPx()),
+            )
+            drawArc(
+                color = StratosColors.Gold.copy(alpha = if (dark) 0.05f else 0.04f),
+                startAngle = 214f,
+                sweepAngle = 134f,
+                useCenter = false,
+                topLeft = Offset(size.width * 0.32f, size.height * 0.36f),
+                size = Size(size.width * 1.04f, size.width * 0.43f),
                 style = Stroke(width = 1.dp.toPx()),
             )
 
             starPositions.forEachIndexed { index, (x, y) ->
-                drawCircle(
-                    color = starColor.copy(alpha = if (dark) 0.16f + (index % 3) * 0.05f else 0.10f),
-                    radius = (if (index % 4 == 0) 1.3.dp else 0.75.dp).toPx(),
-                    center = Offset(size.width * x, size.height * y),
-                )
+                val radius = if (index % 5 == 0) 1.45.dp else 0.75.dp
+                val center = Offset(size.width * x, size.height * y)
+                val alpha = if (dark) 0.13f + (index % 3) * 0.055f else 0.09f
+                drawCircle(color = starColor.copy(alpha = alpha), radius = radius.toPx(), center = center)
+                if (index % 5 == 0) {
+                    drawLine(
+                        color = starColor.copy(alpha = alpha * 0.58f),
+                        start = Offset(center.x - 3.dp.toPx(), center.y),
+                        end = Offset(center.x + 3.dp.toPx(), center.y),
+                        strokeWidth = 0.55.dp.toPx(),
+                    )
+                    drawLine(
+                        color = starColor.copy(alpha = alpha * 0.58f),
+                        start = Offset(center.x, center.y - 3.dp.toPx()),
+                        end = Offset(center.x, center.y + 3.dp.toPx()),
+                        strokeWidth = 0.55.dp.toPx(),
+                    )
+                }
             }
         }
         content()
     }
 }
 
-/** A premium translucent surface with a restrained spectral edge. */
+/** A tactile, translucent surface with a subtle spectral rim and elevated shadow. */
 @Composable
 fun StratosGlassCard(
     modifier: Modifier = Modifier,
@@ -171,34 +217,53 @@ fun StratosGlassCard(
     val fill = if (dark) {
         Brush.linearGradient(
             listOf(
-                MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.88f),
-                MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.78f),
+                MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.90f),
+                MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.79f),
+                MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.84f),
             ),
+            start = Offset(0f, 0f),
+            end = Offset(900f, 1100f),
         )
     } else {
         Brush.linearGradient(
             listOf(
-                MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
-                MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.88f),
+                MaterialTheme.colorScheme.surface.copy(alpha = 0.94f),
+                MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.90f),
             ),
+            start = Offset(0f, 0f),
+            end = Offset(900f, 1100f),
         )
     }
     val edge = Brush.linearGradient(
         listOf(
-            Color.White.copy(alpha = if (dark) 0.16f else 0.82f),
-            StratosColors.Cyan.copy(alpha = if (dark) 0.24f else 0.18f),
-            StratosColors.Indigo.copy(alpha = if (dark) 0.28f else 0.16f),
+            Color.White.copy(alpha = if (dark) 0.19f else 0.86f),
+            StratosColors.Cyan.copy(alpha = if (dark) 0.28f else 0.18f),
+            StratosColors.Indigo.copy(alpha = if (dark) 0.22f else 0.16f),
             Color.Transparent,
         ),
     )
 
     Box(
         modifier = modifier
-            .background(fill, shape)
+            .shadow(14.dp, shape, clip = false)
+            .clip(shape)
+            .background(fill)
             .border(1.dp, edge, shape)
             .padding(contentPadding),
-        content = content,
-    )
+    ) {
+        Canvas(Modifier.matchParentSize()) {
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(Color.White.copy(alpha = if (dark) 0.045f else 0.24f), Color.Transparent),
+                    center = Offset(size.width * 0.10f, -size.height * 0.05f),
+                    radius = size.width * 0.90f,
+                ),
+                radius = size.width * 0.90f,
+                center = Offset(size.width * 0.10f, -size.height * 0.05f),
+            )
+        }
+        content()
+    }
 }
 
 /** Main call-to-action treatment used on login and server-selection screens. */
@@ -215,28 +280,42 @@ fun StratosPrimaryButton(
         StratosColors.PremiumGradient
     } else {
         Brush.linearGradient(
-            listOf(
-                MaterialTheme.colorScheme.surfaceVariant,
-                MaterialTheme.colorScheme.surfaceVariant,
-            ),
+            listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surfaceVariant),
         )
     }
-    Row(
+    Box(
         modifier = modifier
             .defaultMinSize(minHeight = 54.dp)
-            .background(brush, shape)
+            .shadow(if (enabled) 12.dp else 0.dp, shape, clip = false)
+            .clip(shape)
+            .background(brush)
             .border(
                 width = 1.dp,
-                color = Color.White.copy(alpha = if (enabled) 0.24f else 0.08f),
+                color = Color.White.copy(alpha = if (enabled) 0.32f else 0.08f),
                 shape = shape,
             )
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .semantics(mergeDescendants = true) { }
             .padding(contentPadding),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        content = content,
-    )
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(Modifier.matchParentSize()) {
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(Color.White.copy(alpha = if (enabled) 0.28f else 0f), Color.Transparent),
+                    center = Offset(size.width * 0.15f, -size.height * 0.1f),
+                    radius = size.width * 0.75f,
+                ),
+                radius = size.width * 0.75f,
+                center = Offset(size.width * 0.15f, -size.height * 0.1f),
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            content = content,
+        )
+    }
 }
 
 /** Compact circular action used in branded top bars. */
@@ -252,11 +331,16 @@ fun StratosIconAction(
     Box(
         modifier = modifier
             .size(44.dp)
+            .shadow(if (enabled) 8.dp else 0.dp, CircleShape, clip = false)
             .background(
-                MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = if (enabled) 0.72f else 0.42f),
+                MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = if (enabled) 0.78f else 0.42f),
                 CircleShape,
             )
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f), CircleShape)
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.62f),
+                CircleShape,
+            )
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .semantics(mergeDescendants = true) {
                 this.contentDescription = contentDescription
@@ -286,14 +370,14 @@ fun StratosBrandLockup(
     compact: Boolean = false,
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        StratosLogo(if (compact) 38.dp else 48.dp, contentDescription = null)
+        StratosLogo(if (compact) 40.dp else 50.dp, contentDescription = null)
         Spacer(Modifier.width(if (compact) 9.dp else 12.dp))
         Column {
             Text(
                 text = title,
                 style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 0.4.sp,
+                letterSpacing = 0.45.sp,
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -301,10 +385,73 @@ fun StratosBrandLockup(
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.labelSmall,
-                letterSpacing = 1.2.sp,
+                letterSpacing = 1.35.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+/** Page title with an editorial hierarchy that works in LTR and RTL locales. */
+@Composable
+fun StratosScreenTitle(
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.35.sp,
+            color = StratosColors.Cyan,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(Modifier.size(2.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.ExtraBold,
+            letterSpacing = (-0.25).sp,
+            color = MaterialTheme.colorScheme.onBackground,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/** Small non-interactive state marker for high-value status or selected states. */
+@Composable
+fun StratosStatusBadge(
+    label: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        color = color.copy(alpha = 0.13f),
+        shape = RoundedCornerShape(50),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier
+                    .size(6.dp)
+                    .background(color, CircleShape),
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = color,
+                maxLines = 1,
             )
         }
     }

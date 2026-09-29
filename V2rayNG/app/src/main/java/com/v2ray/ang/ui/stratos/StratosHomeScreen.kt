@@ -14,11 +14,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -53,6 +55,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -185,10 +188,22 @@ fun StratosHomeScreen(
                             .fillMaxWidth()
                             .widthIn(max = 680.dp)
                             .align(Alignment.TopCenter)
+                            .consumeWindowInsets(innerPadding)
                             .verticalScroll(rememberScrollState())
                             .padding(horizontal = 20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
+                        Spacer(Modifier.height(4.dp))
+                        StratosConnectionStatusPill(state)
+                        Spacer(Modifier.height(5.dp))
+
+                        StratosConnectRing(
+                            state = state,
+                            onToggle = { onAction(StratosHomeAction.ToggleConnect) },
+                        )
+
+                        Spacer(Modifier.height(18.dp))
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -213,13 +228,6 @@ fun StratosHomeScreen(
                                 contentDescription = stringResource(R.string.stratos_dns_title),
                             )
                         }
-
-                        Spacer(Modifier.height(14.dp))
-
-                        StratosConnectRing(
-                            state = state,
-                            onToggle = { onAction(StratosHomeAction.ToggleConnect) },
-                        )
 
                         Spacer(Modifier.height(14.dp))
 
@@ -279,7 +287,7 @@ fun StratosHomeScreen(
                             else -> StratosPlanPanel(state = state)
                         }
 
-                        Spacer(Modifier.height(26.dp))
+                        Spacer(Modifier.height(34.dp))
                     }
                 }
             }
@@ -344,6 +352,24 @@ private fun dnsLabel(presetId: String): String = when (presetId) {
 // ======================================================================================
 
 @Composable
+private fun StratosConnectionStatusPill(state: StratosHomeUiState) {
+    val (label, color) = when {
+        state.isExpired -> stringResource(R.string.stratos_expired_title) to StratosColors.Danger
+        state.connectState == StratosConnectState.Connected ->
+            stringResource(R.string.stratos_connected) to StratosColors.Success
+
+        state.connectState == StratosConnectState.Connecting ->
+            stringResource(R.string.stratos_connecting) to StratosColors.Cyan
+
+        state.connectState == StratosConnectState.Stopping ->
+            stringResource(R.string.stratos_disconnecting) to StratosColors.Warning
+
+        else -> stringResource(R.string.stratos_disconnected) to MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    StratosStatusBadge(label = label, color = color)
+}
+
+@Composable
 private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) {
     val connected = state.connectState == StratosConnectState.Connected
     val transitioning = state.connectState == StratosConnectState.Connecting ||
@@ -354,40 +380,71 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
         animationSpec = tween(900),
         label = "ring",
     )
-    val glowPulse by rememberInfiniteTransition(label = "pulse").animateFloat(
+    val transition = rememberInfiniteTransition(label = "connection-orbit")
+    val glowPulse by transition.animateFloat(
         initialValue = 0.72f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(tween(1800, easing = LinearEasing), RepeatMode.Reverse),
         label = "glow",
     )
+    val orbitTurn by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(7600, easing = LinearEasing)),
+        label = "orbit-turn",
+    )
     val connectDescription = stringResource(
         if (connected) R.string.stratos_disconnect else R.string.stratos_connect,
     )
-    val ringTrackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.42f)
+    val ringTrackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
-            modifier = Modifier.size(252.dp),
+            modifier = Modifier.size(282.dp),
             contentAlignment = Alignment.Center,
         ) {
             Canvas(Modifier.fillMaxSize()) {
                 val center = Offset(size.width / 2f, size.height / 2f)
-                val aura = if (connected) StratosColors.Cyan else StratosColors.Indigo
+                val aura = when {
+                    connected -> StratosColors.Cyan
+                    transitioning -> StratosColors.Aurora
+                    else -> StratosColors.Indigo
+                }
                 drawCircle(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            aura.copy(alpha = (if (connected) 0.20f else 0.11f) * glowPulse),
+                            aura.copy(alpha = (if (connected) 0.24f else 0.13f) * glowPulse),
                             Color.Transparent,
                         ),
                         center = center,
-                        radius = size.minDimension * 0.50f,
+                        radius = size.minDimension * 0.52f,
                     ),
                     center = center,
-                    radius = size.minDimension * 0.50f,
+                    radius = size.minDimension * 0.52f,
+                )
+
+                val outerInset = 5.dp.toPx()
+                drawArc(
+                    color = StratosColors.SoftIndigo.copy(alpha = 0.20f),
+                    startAngle = 202f,
+                    sweepAngle = 124f,
+                    useCenter = false,
+                    topLeft = Offset(outerInset, outerInset),
+                    size = Size(size.width - outerInset * 2, size.height - outerInset * 2),
+                    style = Stroke(width = 1.dp.toPx()),
+                )
+                drawArc(
+                    color = StratosColors.Gold.copy(alpha = 0.16f),
+                    startAngle = 25f,
+                    sweepAngle = 58f,
+                    useCenter = false,
+                    topLeft = Offset(outerInset, outerInset),
+                    size = Size(size.width - outerInset * 2, size.height - outerInset * 2),
+                    style = Stroke(width = 1.dp.toPx()),
                 )
 
                 val stroke = 10.dp.toPx()
-                val inset = 14.dp.toPx()
+                val inset = 22.dp.toPx()
                 val diameter = size.minDimension - inset * 2
                 val topLeft = Offset((size.width - diameter) / 2, (size.height - diameter) / 2)
                 val arcSize = Size(diameter, diameter)
@@ -420,34 +477,27 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
                     alpha = if (connected) glowPulse else 0.92f,
                 )
 
-                drawArc(
-                    color = StratosColors.SoftIndigo.copy(alpha = 0.20f),
-                    startAngle = 206f,
-                    sweepAngle = 118f,
-                    useCenter = false,
-                    topLeft = Offset(2.dp.toPx(), 2.dp.toPx()),
-                    size = Size(size.width - 4.dp.toPx(), size.height - 4.dp.toPx()),
-                    style = Stroke(width = 1.dp.toPx()),
+                val satelliteAngle = Math.toRadians((if (connected || transitioning) orbitTurn else 324f).toDouble())
+                val orbitRadius = size.minDimension / 2f - outerInset
+                val satelliteCenter = Offset(
+                    center.x + kotlin.math.cos(satelliteAngle).toFloat() * orbitRadius,
+                    center.y + kotlin.math.sin(satelliteAngle).toFloat() * orbitRadius,
                 )
-                val satelliteAngle = Math.toRadians(324.0)
-                val orbitRadius = size.minDimension / 2f - 2.dp.toPx()
                 drawCircle(
-                    color = StratosColors.Cyan.copy(alpha = 0.86f),
-                    radius = 2.6.dp.toPx(),
-                    center = Offset(
-                        center.x + kotlin.math.cos(satelliteAngle).toFloat() * orbitRadius,
-                        center.y + kotlin.math.sin(satelliteAngle).toFloat() * orbitRadius,
-                    ),
+                    color = aura.copy(alpha = 0.22f),
+                    radius = 7.dp.toPx(),
+                    center = satelliteCenter,
+                )
+                drawCircle(
+                    color = aura.copy(alpha = 0.94f),
+                    radius = 2.8.dp.toPx(),
+                    center = satelliteCenter,
                 )
             }
 
             val buttonBrush = when {
                 connected -> Brush.linearGradient(
-                    listOf(
-                        StratosColors.Cyan,
-                        StratosColors.Sky,
-                        StratosColors.Indigo,
-                    ),
+                    listOf(StratosColors.Cyan, StratosColors.Sky, StratosColors.Indigo),
                 )
 
                 transitioning -> Brush.linearGradient(
@@ -456,18 +506,18 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
 
                 else -> Brush.linearGradient(
                     listOf(
-                        MaterialTheme.colorScheme.surfaceContainerHighest,
-                        MaterialTheme.colorScheme.surfaceContainer,
+                        MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.97f),
+                        MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.94f),
                     ),
                 )
             }
             Box(
                 modifier = Modifier
-                    .size(184.dp)
+                    .size(198.dp)
                     .background(buttonBrush, CircleShape)
                     .border(
                         1.dp,
-                        Color.White.copy(alpha = if (connected) 0.30f else 0.10f),
+                        Color.White.copy(alpha = if (connected || transitioning) 0.36f else 0.13f),
                         CircleShape,
                     )
                     .clickable(
@@ -481,10 +531,21 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
                     },
                 contentAlignment = Alignment.Center,
             ) {
+                Canvas(Modifier.fillMaxSize()) {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            listOf(Color.White.copy(alpha = if (connected) 0.23f else 0.08f), Color.Transparent),
+                            center = Offset(size.width * 0.30f, size.height * 0.18f),
+                            radius = size.width * 0.78f,
+                        ),
+                        radius = size.width * 0.78f,
+                        center = Offset(size.width * 0.30f, size.height * 0.18f),
+                    )
+                }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     if (transitioning) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(35.dp),
+                            modifier = Modifier.size(37.dp),
                             color = Color.White,
                             strokeWidth = 2.5.dp,
                         )
@@ -493,7 +554,7 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
                             color = if (connected) Color.White.copy(alpha = 0.16f)
                             else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.78f),
                             shape = CircleShape,
-                            modifier = Modifier.size(61.dp),
+                            modifier = Modifier.size(63.dp),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
@@ -505,13 +566,13 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
                             }
                         }
                     }
-                    Spacer(Modifier.height(9.dp))
+                    Spacer(Modifier.height(10.dp))
                     Text(
                         text = stringResource(statusLabel(state.connectState)),
                         color = if (connected || transitioning) Color.White
                         else MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                     )
                 }
             }
@@ -520,11 +581,12 @@ private fun StratosConnectRing(state: StratosHomeUiState, onToggle: () -> Unit) 
         Text(
             text = when {
                 state.isExpired -> stringResource(R.string.stratos_expired_title)
-                connected -> state.selectedServerRemark
+                connected -> state.selectedServerRemark.ifBlank { stringResource(R.string.stratos_connected) }
+                transitioning -> stringResource(statusLabel(state.connectState))
                 else -> stringResource(R.string.stratos_tap_to_connect)
             },
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             color = if (connected) StratosColors.Cyan else MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -1091,14 +1153,19 @@ private fun StratosChangePasswordDialog(
     onDismiss: () -> Unit,
     onSubmit: (String, String) -> Unit,
 ) {
-    var current by remember { mutableStateOf("") }
-    var next by remember { mutableStateOf("") }
+    var current by rememberSaveable { mutableStateOf("") }
+    var next by rememberSaveable { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.stratos_change_password_title)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .imePadding(),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
                 OutlinedTextField(
                     value = current,
                     onValueChange = { current = it },

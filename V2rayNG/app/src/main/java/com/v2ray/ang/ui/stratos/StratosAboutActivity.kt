@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -81,10 +82,9 @@ private fun StratosAboutScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(
-                            stringResource(R.string.stratos_menu_about),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.ExtraBold,
+                        StratosScreenTitle(
+                            title = stringResource(R.string.stratos_menu_about),
+                            subtitle = stringResource(R.string.stratos_tagline),
                         )
                     },
                     navigationIcon = {
@@ -102,7 +102,8 @@ private fun StratosAboutScreen(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
             ) {
                 Column(
                     Modifier

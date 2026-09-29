@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -113,6 +115,55 @@ class StratosDnsActivity : HelperBaseComponentActivity() {
 // Screen
 // --------------------------------------------------------------------------------------
 
+@Composable
+private fun StratosDnsOverview(label: String, description: String) {
+    StratosGlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = StratosColors.Cyan.copy(alpha = 0.14f),
+                shape = RoundedCornerShape(15.dp),
+                modifier = Modifier.size(48.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        painterResource(R.drawable.ic_stratos_shield_24),
+                        contentDescription = null,
+                        tint = StratosColors.Cyan,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+            }
+            Spacer(Modifier.width(13.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.stratos_dns_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    label,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StratosDnsScreen(
@@ -121,6 +172,8 @@ private fun StratosDnsScreen(
     onSelect: (String) -> Unit,
 ) {
     val selectedId by uiState.collectAsStateWithLifecycle()
+    val selectedPreset = StratosSettingsController.dnsPresets.firstOrNull { it.id == selectedId }
+        ?: StratosSettingsController.dnsPresets.first()
 
     StratosBackdrop {
         Scaffold(
@@ -128,18 +181,10 @@ private fun StratosDnsScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Column {
-                            Text(
-                                stringResource(R.string.stratos_dns_title),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.ExtraBold,
-                            )
-                            Text(
-                                stringResource(R.string.stratos_tagline),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
+                        StratosScreenTitle(
+                            title = stringResource(R.string.stratos_dns_title),
+                            subtitle = stringResource(R.string.stratos_tagline),
+                        )
                     },
                     navigationIcon = {
                         StratosIconAction(
@@ -156,7 +201,8 @@ private fun StratosDnsScreen(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
             ) {
                 Column(
                     Modifier
@@ -168,22 +214,34 @@ private fun StratosDnsScreen(
                     verticalArrangement = Arrangement.spacedBy(11.dp),
                 ) {
                     Spacer(Modifier.height(4.dp))
+                    StratosDnsOverview(
+                        label = stringResource(selectedPreset.labelRes),
+                        description = stringResource(selectedPreset.descRes),
+                    )
+                    Spacer(Modifier.height(4.dp))
                     StratosSettingsController.dnsPresets.forEach { preset ->
                     val selected = preset.id == selectedId
                     val label = stringResource(preset.labelRes)
+                    val accent = when (preset.id) {
+                        "ads" -> StratosColors.Aurora
+                        "family" -> StratosColors.Success
+                        "gaming" -> StratosColors.Gold
+                        else -> StratosColors.Cyan
+                    }
                     StratosGlassCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .then(
                                 if (selected) Modifier.border(
                                     1.dp,
-                                    StratosColors.Cyan.copy(alpha = 0.40f),
+                                    accent.copy(alpha = 0.48f),
                                     RoundedCornerShape(22.dp),
                                 ) else Modifier,
                             )
                             .clip(RoundedCornerShape(22.dp))
                             .clickable(role = Role.RadioButton) { onSelect(preset.id) }
                             .semantics(mergeDescendants = true) {
+                                contentDescription = label
                                 role = Role.RadioButton
                                 this.selected = selected
                             },
@@ -194,7 +252,7 @@ private fun StratosDnsScreen(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Surface(
-                                color = if (selected) StratosColors.Cyan.copy(alpha = 0.13f)
+                                color = if (selected) accent.copy(alpha = 0.15f)
                                 else MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.58f),
                                 shape = RoundedCornerShape(14.dp),
                                 modifier = Modifier.size(46.dp),
@@ -203,7 +261,7 @@ private fun StratosDnsScreen(
                                     Icon(
                                         painterResource(R.drawable.ic_stratos_shield_24),
                                         contentDescription = null,
-                                        tint = if (selected) StratosColors.Cyan
+                                        tint = if (selected) accent
                                         else MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(23.dp),
                                     )
@@ -215,7 +273,7 @@ private fun StratosDnsScreen(
                                     label,
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (selected) StratosColors.Cyan
+                                    color = if (selected) accent
                                     else MaterialTheme.colorScheme.onSurface,
                                 )
                                 Spacer(Modifier.height(3.dp))

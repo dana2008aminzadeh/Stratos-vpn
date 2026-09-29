@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -174,18 +176,10 @@ private fun StratosSettingsScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Column {
-                            Text(
-                                stringResource(R.string.stratos_menu_settings),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.ExtraBold,
-                            )
-                            Text(
-                                stringResource(R.string.stratos_tagline),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
+                        StratosScreenTitle(
+                            title = stringResource(R.string.stratos_menu_settings),
+                            subtitle = stringResource(R.string.stratos_tagline),
+                        )
                     },
                     navigationIcon = {
                         StratosIconAction(
@@ -202,7 +196,8 @@ private fun StratosSettingsScreen(
             Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
             ) {
                 Column(
                     Modifier
@@ -375,6 +370,7 @@ private fun StratosLanguageRow(
             .clip(RoundedCornerShape(14.dp))
             .clickable(role = Role.RadioButton) { onSelect(code) }
             .semantics(mergeDescendants = true) {
+                contentDescription = label
                 role = Role.RadioButton
                 this.selected = isSelected
             }

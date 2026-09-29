@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -47,6 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -75,19 +77,10 @@ fun StratosServersScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Column {
-                            Text(
-                                stringResource(R.string.stratos_servers_title),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.ExtraBold,
-                            )
-                            Text(
-                                stringResource(R.string.stratos_tagline),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                letterSpacing = 0.8.sp,
-                            )
-                        }
+                        StratosScreenTitle(
+                            title = stringResource(R.string.stratos_servers_title),
+                            subtitle = stringResource(R.string.stratos_tagline),
+                        )
                     },
                     navigationIcon = {
                         StratosIconAction(
@@ -128,7 +121,8 @@ fun StratosServersScreen(
             Column(
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
             ) {
                 StratosPrimaryButton(
                     onClick = { onAction(StratosServersAction.AutoConnect) },
@@ -166,7 +160,17 @@ fun StratosServersScreen(
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(14.dp))
+
+                StratosFleetOverview(
+                    state = state,
+                    onRefresh = { onAction(StratosServersAction.Refresh) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                )
+
+                Spacer(Modifier.height(14.dp))
 
                 if (state.isEmpty && !state.isRefreshing) {
                     StratosEmptyServers(
@@ -200,6 +204,67 @@ fun StratosServersScreen(
                         item { Spacer(Modifier.height(18.dp)) }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StratosFleetOverview(
+    state: StratosServersUiState,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val serverCount = state.groups.sumOf { it.servers.size }
+    StratosGlassCard(
+        modifier = modifier,
+        shape = RoundedCornerShape(22.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = StratosColors.Indigo.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.size(44.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        painterResource(R.drawable.ic_stratos_globe_24),
+                        contentDescription = null,
+                        tint = StratosColors.Cyan,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.stratos_servers_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    stringResource(R.string.stratos_server_count, serverCount),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (state.isRefreshing) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = StratosColors.Cyan,
+                    strokeWidth = 2.dp,
+                )
+            } else {
+                StratosIconAction(
+                    icon = R.drawable.ic_stratos_refresh_24,
+                    contentDescription = stringResource(R.string.stratos_refresh),
+                    onClick = onRefresh,
+                )
             }
         }
     }
@@ -262,6 +327,8 @@ private fun StratosCountryCard(
     val expansionState = stringResource(
         if (expanded) R.string.stratos_expanded else R.string.stratos_collapsed,
     )
+    val countryDescription = "${group.countryName}, " +
+            stringResource(R.string.stratos_server_count, group.servers.size)
 
     StratosGlassCard(
         modifier = Modifier
@@ -283,6 +350,7 @@ private fun StratosCountryCard(
                     .clip(RoundedCornerShape(22.dp))
                     .clickable(role = Role.Button, onClick = onToggle)
                     .semantics(mergeDescendants = true) {
+                        contentDescription = countryDescription
                         role = Role.Button
                         stateDescription = expansionState
                     }
@@ -371,6 +439,7 @@ private fun StratosServerRowItem(
             )
             .clickable(role = Role.RadioButton, onClick = onClick)
             .semantics(mergeDescendants = true) {
+                contentDescription = row.remark.ifBlank { row.server.name }
                 role = Role.RadioButton
                 this.selected = selected
             }

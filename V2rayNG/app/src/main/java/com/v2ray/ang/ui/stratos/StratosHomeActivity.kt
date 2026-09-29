@@ -327,6 +327,10 @@ class StratosHomeViewModel(private val app: AngApplication) : ViewModel() {
             withContext(Dispatchers.Main) {
                 refreshSelectedServer()
                 refreshDns()
+                refreshLocalIp()
+                if (_uiState.value.connectState == StratosConnectState.Connected) {
+                    refreshVpnIp()
+                }
                 if (userInitiated && !ok) {
                     _events.trySend(StratosHomeEvent.ToastRes(R.string.stratos_error_network))
                 }
