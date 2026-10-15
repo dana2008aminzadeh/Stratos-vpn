@@ -34,8 +34,15 @@ object NotificationManager {
     private const val NOTIFICATION_PENDING_INTENT_RESTART_V2RAY = 2
     private const val NOTIFICATION_ICON_THRESHOLD = 3000
     private const val QUERY_INTERVAL_MS = 3000L
+    // Screen-off / idle backoff: the loop keeps feeding Stratos usage accounting and
+    // the quota gate while connected, but polls far less often when nobody watches.
+    private const val IDLE_QUERY_INTERVAL_MS = 15_000L
 
     private var lastQueryTime = 0L
+    private var idleMode = false
+
+    @Volatile
+    private var activeTrafficSource: (() -> Pair<Long, Long>)? = null
     private var mBuilder: NotificationCompat.Builder? = null
     private var speedNotificationJob: Job? = null
     private var mNotificationManager: NotificationManager? = null
@@ -44,19 +51,39 @@ object NotificationManager {
      * Starts the speed notification.
      * @param currentConfig The current profile configuration.
      */
-    fun startSpeedNotification() {
+    fun startSpeedNotification(trafficSource: (() -> Pair<Long, Long>)? = null) {
         // Stratos VPN: the live-traffic notification is mandatory; it also feeds
         // the local usage accounting, so the loop must always run while connected.
-        if (speedNotificationJob != null || CoreServiceManager.isRunning() == false) return
+        // A non-null [trafficSource] supplies cumulative (up, down) byte counters for
+        // sessions that do not run the Xray core (the Lightway engine samples uid
+        // counters instead); with no source the loop still requires the core.
+        if (trafficSource != null) activeTrafficSource = trafficSource
+        val source = trafficSource ?: activeTrafficSource
+        if (speedNotificationJob != null) return
+        if (source == null && CoreServiceManager.isRunning() == false) return
 
         var lastZeroSpeed = false
 
         speedNotificationJob = CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
-                lastZeroSpeed = updateSpeedNotificationOnce(lastZeroSpeed)
-                delay(QUERY_INTERVAL_MS)
+                lastZeroSpeed = updateSpeedNotificationOnce(lastZeroSpeed, source)
+                delay(if (idleMode) IDLE_QUERY_INTERVAL_MS else QUERY_INTERVAL_MS)
             }
         }
+    }
+
+    /**
+     * Screen off: keep the loop (usage accounting and the quota gate must survive
+     * background operation) but stretch its cadence to [IDLE_QUERY_INTERVAL_MS].
+     */
+    fun enterIdleMode() {
+        idleMode = true
+        startSpeedNotification()
+    }
+
+    /** Screen on: restore the fast cadence immediately. */
+    fun leaveIdleMode() {
+        idleMode = false
     }
 
     /**
@@ -158,6 +185,7 @@ object NotificationManager {
             speedNotificationJob = null
             updateNotification("", 0, 0)
         }
+        activeTrafficSource = null
     }
 
     /**
@@ -237,7 +265,10 @@ object NotificationManager {
      * @param lastZeroSpeed The previous zero speed state.
      * @return The current zero speed state.
      */
-    private fun updateSpeedNotificationOnce(lastZeroSpeed: Boolean): Boolean {
+    private fun updateSpeedNotificationOnce(
+        lastZeroSpeed: Boolean,
+        trafficSource: (() -> Pair<Long, Long>)? = null,
+    ): Boolean {
         val queryTime = System.currentTimeMillis()
         val sinceLastQueryIn = (queryTime - lastQueryTime)
 
@@ -254,20 +285,27 @@ object NotificationManager {
         var directUplink = 0L
         var directDownlink = 0L
 
-        CoreServiceManager.queryAllOutboundTrafficStats().forEach { stat ->
-            when {
-                stat.tag == AppConfig.TAG_DIRECT -> {
-                    when (stat.direction) {
-                        AppConfig.UPLINK -> directUplink += stat.value
-                        AppConfig.DOWNLINK -> directDownlink += stat.value
+        if (trafficSource != null) {
+            // Non-core session (Lightway): counters are cumulative uid totals.
+            val (up, down) = trafficSource()
+            proxyUplink = up
+            proxyDownlink = down
+        } else {
+            CoreServiceManager.queryAllOutboundTrafficStats().forEach { stat ->
+                when {
+                    stat.tag == AppConfig.TAG_DIRECT -> {
+                        when (stat.direction) {
+                            AppConfig.UPLINK -> directUplink += stat.value
+                            AppConfig.DOWNLINK -> directDownlink += stat.value
+                        }
                     }
-                }
 
-                // Accumulate stats for all proxy outbounds (including custom subscription tags)
-                stat.tag != AppConfig.TAG_BLOCKED -> {
-                    when (stat.direction) {
-                        AppConfig.UPLINK -> proxyUplink += stat.value
-                        AppConfig.DOWNLINK -> proxyDownlink += stat.value
+                    // Accumulate stats for all proxy outbounds (including custom subscription tags)
+                    stat.tag != AppConfig.TAG_BLOCKED -> {
+                        when (stat.direction) {
+                            AppConfig.UPLINK -> proxyUplink += stat.value
+                            AppConfig.DOWNLINK -> proxyDownlink += stat.value
+                        }
                     }
                 }
             }

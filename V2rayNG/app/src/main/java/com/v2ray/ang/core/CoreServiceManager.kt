@@ -24,7 +24,9 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.helper.MessageHelper
+import com.v2ray.ang.relay.RelayManager
 import com.v2ray.ang.service.DialerNativeService
 import com.v2ray.ang.service.DialerWebviewService
 import com.v2ray.ang.service.NetworkMonitor
@@ -130,6 +132,12 @@ object CoreServiceManager {
         val guid = MmkvManager.getSelectServer() ?: error("No server selected")
         val config = MmkvManager.decodeServerConfig(guid) ?: error("Failed to decode server config")
 
+        // Lightway is a separate engine driven by the VPN service; the Xray core
+        // (root / proxy-only paths land here too) must refuse it with a clear reason.
+        if (config.configType == EConfigType.LIGHTWAY) {
+            error(service.getString(com.v2ray.ang.R.string.stratos_lightway_vpn_only))
+        }
+
         LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting core loop for ${config.remarks}")
         val result = CoreConfigManager.getV2rayConfig(service, guid)
         LogUtil.d(AppConfig.TAG, result.content)
@@ -138,6 +146,13 @@ object CoreServiceManager {
         }
 
         currentConfig = config
+
+        // Sidecar relays for protocols Xray lacks (SSH, DNSTT) must accept loopback
+        // connections before the core dials them.
+        if (!RelayManager.ensureStarted(service, config)) {
+            error("Failed to start the connection relay for this protocol")
+        }
+
         var tunFd = vpnInterface?.fd ?: 0
         val dialerMode = BrowserDialerMode.from(config.browserDialerMode)
         val dialerAddr = if (dialerMode != null) {
@@ -207,6 +222,9 @@ object CoreServiceManager {
             }
         }
 
+        // Relay lifetime is bound to the core loop.
+        RelayManager.stop()
+
         // Close existing browser dialer
         CoreNativeManager.reconcileBrowserDialer("")
         if (browserDialer != null) {
@@ -215,6 +233,7 @@ object CoreServiceManager {
         }
 
         MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
+        NotificationManager.stopSpeedNotification()
         NotificationManager.cancelNotification()
 
         try {
@@ -508,12 +527,13 @@ object CoreServiceManager {
             when (intent?.action) {
                 Intent.ACTION_SCREEN_OFF -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen off")
-                    NotificationManager.stopSpeedNotification()
+                    // Keep the loop alive (usage accounting + quota gate) on a slow cadence.
+                    NotificationManager.enterIdleMode()
                 }
 
                 Intent.ACTION_SCREEN_ON -> {
                     LogUtil.i(AppConfig.TAG, "StartCore-Manager: Screen on")
-                    NotificationManager.startSpeedNotification()
+                    NotificationManager.leaveIdleMode()
                 }
             }
         }

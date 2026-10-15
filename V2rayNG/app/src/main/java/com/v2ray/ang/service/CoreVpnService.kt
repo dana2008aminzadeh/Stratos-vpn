@@ -17,6 +17,9 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.contracts.Tun2SocksControl
 import com.v2ray.ang.core.CoreServiceManager
+import com.v2ray.ang.dto.entities.ProfileItem
+import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.lightway.LightwayEngine
 import com.v2ray.ang.handler.AppLocaleManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
@@ -106,8 +109,16 @@ class CoreVpnService : VpnService(), ServiceControl {
             LogUtil.e(AppConfig.TAG, "StartCore-VPN: Interface not initialized")
             return
         }
-        if (!CoreServiceManager.startCoreLoop(mInterface)) {
-            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to start core loop")
+        val started = selectedProfile()?.let { profile ->
+            if (profile.configType == EConfigType.LIGHTWAY) {
+                // Lightway replaces the core: the engine drives the same TUN directly.
+                LightwayEngine.start(this, mInterface.fd, profile)
+            } else {
+                CoreServiceManager.startCoreLoop(mInterface)
+            }
+        } ?: CoreServiceManager.startCoreLoop(mInterface)
+        if (!started) {
+            LogUtil.e(AppConfig.TAG, "StartCore-VPN: Failed to start tunnel engine")
             stopAllService()
             return
         }
@@ -115,6 +126,10 @@ class CoreVpnService : VpnService(), ServiceControl {
         // Start LAN sharing if enabled in settings
         RootLanSharing.startClientSharing(this)
     }
+
+    /** The profile the user selected, decoded once per service call. */
+    private fun selectedProfile(): ProfileItem? =
+        MmkvManager.getSelectServer()?.let { MmkvManager.decodeServerConfig(it) }
 
     override fun stopService() {
         stopAllService(true)
@@ -303,6 +318,11 @@ class CoreVpnService : VpnService(), ServiceControl {
      * Starts the tun2socks process with the appropriate parameters.
      */
     private fun runTun2socks() {
+        // Lightway owns the TUN exclusively — never start tun2socks beside it.
+        if (selectedProfile()?.configType == EConfigType.LIGHTWAY) {
+            tun2SocksService = null
+            return
+        }
         if (SettingsManager.isUsingHevTun()) {
             tun2SocksService = TProxyService(
                 context = applicationContext,
@@ -324,6 +344,10 @@ class CoreVpnService : VpnService(), ServiceControl {
 //        saveVpnNetworkInfo(configName, info)
         unlockStart()
         isRunning = false
+
+        // Lightway teardown: best-effort engine stop; the TUN close below is the
+        // authoritative end of the session (see LightwayEngine).
+        LightwayEngine.stop()
 
         tun2SocksService?.stopTun2Socks()
         tun2SocksService = null

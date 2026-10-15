@@ -81,6 +81,35 @@ jobs:
         fileName: 'libv2ray.aar'
         out-file-path: V2rayNG/app/libs/
 
+    - name: Download Lightway AAR
+      uses: robinraju/release-downloader@v1.13
+      with:
+        repository: 'expressvpn/lightway'
+        tag: 'lightway-nightly'
+        fileName: 'lightway-release.aar'
+        out-file-path: V2rayNG/app/libs/
+
+    - name: Setup Go (dnstt client)
+      uses: actions/setup-go@v5
+      with:
+        go-version: 'stable'
+
+    - name: Build dnstt client binaries
+      # dnstt-client is packaged as libdnsttclient.so per ABI: Android only extracts
+      # executable helpers from the native library dir (W^X policy) and only accepts
+      # the lib*.so naming there in release builds. Pinned mirror commit for
+      # reproducibility; source: https://www.bamsoftware.com/git/dnstt.git
+      run: |
+        set -euo pipefail
+        curl -sL "https://github.com/tladesignz/dnstt/archive/f1b9b97a269f83bad41d2ceef291b4d2c161cd11.tar.gz" | tar xz
+        cd dnstt-f1b9b97a269f83bad41d2ceef291b4d2c161cd11
+        go mod download
+        mkdir -p ../V2rayNG/app/libs/arm64-v8a ../V2rayNG/app/libs/armeabi-v7a ../V2rayNG/app/libs/x86_64
+        GOOS=android GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/arm64-v8a/libdnsttclient.so ./dnstt-client
+        GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/armeabi-v7a/libdnsttclient.so ./dnstt-client
+        GOOS=android GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/x86_64/libdnsttclient.so ./dnstt-client
+        ls -la ../V2rayNG/app/libs/*/libdnsttclient.so
+
     - name: Setup Java
       uses: actions/setup-java@v6.0.1
       with:
@@ -113,11 +142,20 @@ jobs:
           echo "DEBUG_KEYSTORE_USED=true" >> $GITHUB_ENV
         fi
 
-    - name: Build APK
+    - name: Prepare Gradle
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
+
+    - name: Run unit tests
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        ./gradlew :app:testPlaystoreDebugUnitTest
+
+    - name: Build APK
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
         ./gradlew assembleRelease \
           -Pandroid.injected.signing.store.file=${{ github.workspace }}/android_keystore.jks \
           -Pandroid.injected.signing.store.password=${{ env.KS_STORE_PASSWORD }} \

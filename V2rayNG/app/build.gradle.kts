@@ -64,6 +64,8 @@ android {
     sourceSets {
         getByName("main") {
             jniLibs.srcDirs("libs")
+            // Vendored JSch (SSH client) — see third_party/jsch/README.md
+            java.srcDirs("src/main/java", "third_party/jsch/src/main/java")
         }
     }
 
@@ -176,6 +178,7 @@ dependencies {
     // Data and Storage Libraries
     implementation(libs.mmkv.static)
     implementation(libs.gson)
+    implementation(libs.bcprov)
     implementation(libs.okhttp)
 
     // Reactive and Utility Libraries

@@ -12,6 +12,9 @@ import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_REMOTE_DNS
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
+import com.v2ray.ang.fmt.DnsttFmt
+import com.v2ray.ang.fmt.LightwayFmt
+import com.v2ray.ang.fmt.SshFmt
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.util.JsonUtil
 
@@ -126,6 +129,8 @@ class ServerUiState(
         val isSocksOrHttp = configType == EConfigType.SOCKS || configType == EConfigType.HTTP
         val isWireguard = configType == EConfigType.WIREGUARD
         val isHysteria2 = configType == EConfigType.HYSTERIA2
+        val isSsh = configType == EConfigType.SSH
+        val isLightway = configType == EConfigType.LIGHTWAY
 
         return initialConfig.copy(
             configType = configType,
@@ -136,13 +141,19 @@ class ServerUiState(
             method = when {
                 isVmess || isShadowsocks -> method
                 isVless -> encryption
+                isSsh || isLightway -> method.nullIfBlank()
                 else -> null
             },
             flow = if (isVless) flow else null,
-            username = if (isSocksOrHttp) username else null,
+            username = when {
+                isSocksOrHttp || isSsh || isLightway -> username
+                else -> null
+            },
             secretKey = if (isWireguard) secretKey else null,
             publicKey = when {
                 isWireguard -> publicKey
+                configType == EConfigType.DNSTT -> publicKey
+                isSsh && publicKey.isNotBlank() -> publicKey
                 streamSecurity == REALITY -> publicKeyReality
                 else -> null
             },
@@ -196,9 +207,14 @@ class ServerUiState(
                 configType = initialConfig.configType,
                 remarks = initialConfig.remarks,
                 address = initialConfig.server ?: "",
-                port = initialConfig.serverPort ?: DEFAULT_PORT.toString(),
+                port = initialConfig.serverPort ?: defaultPortFor(initialConfig.configType),
                 password = initialConfig.password ?: "",
-                method = initialConfig.method ?: "",
+                method = initialConfig.method ?: when (initialConfig.configType) {
+                    EConfigType.SSH -> SshFmt.AUTH_PASSWORD
+                    EConfigType.DNSTT -> DnsttFmt.TRANSPORT_UDP
+                    EConfigType.LIGHTWAY -> LightwayFmt.DEFAULT_CIPHER
+                    else -> ""
+                },
                 flow = initialConfig.flow ?: "",
                 encryption = initialConfig.method ?: "",
                 username = initialConfig.username ?: "",
@@ -214,7 +230,10 @@ class ServerUiState(
                 portHoppingInterval = initialConfig.portHoppingInterval ?: "",
                 bandwidthDown = initialConfig.bandwidthDown ?: "",
                 bandwidthUp = initialConfig.bandwidthUp ?: "",
-                network = initialConfig.network ?: NetworkType.TCP.type,
+                network = initialConfig.network ?: when (initialConfig.configType) {
+                    EConfigType.LIGHTWAY -> LightwayFmt.DEFAULT_MODE
+                    else -> NetworkType.TCP.type
+                },
                 headerType = initialConfig.headerType ?: "none",
                 mode = initialConfig.mode ?: "",
                 xhttpMode = initialConfig.xhttpMode ?: "",
@@ -245,6 +264,14 @@ class ServerUiState(
         fun from(
             initialConfig: ProfileItem
         ): ServerUiState = fromProfileItem(initialConfig)
+
+        /** Sensible default port for protocols whose well-known port differs from 443. */
+        fun defaultPortFor(configType: EConfigType): String = when (configType) {
+            EConfigType.SSH -> "22"
+            EConfigType.DNSTT -> "53"
+            EConfigType.LIGHTWAY -> LightwayFmt.DEFAULT_PORT
+            else -> DEFAULT_PORT.toString()
+        }
 
         val Saver: Saver<ServerUiState, String> = Saver(
             save = { JsonUtil.toJson(it.toProfileItem(ProfileItem.create(it.configType))) },

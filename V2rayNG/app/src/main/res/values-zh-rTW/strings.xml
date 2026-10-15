@@ -45,6 +45,21 @@
     <string name="menu_item_import_config_manually_trojan">新增 [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">新增 [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">新增 [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_ssh">新增 [SSH]</string>
+    <string name="menu_item_import_config_manually_dnstt">新增 [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">新增 [Lightway]</string>
+    <string name="server_lab_ssh_auth">身分驗證</string>
+    <string name="server_lab_private_key">私鑰</string>
+    <string name="server_lab_passphrase">金鑰密碼</string>
+    <string name="server_lab_host_key_pin">主機金鑰指紋（選用）</string>
+    <string name="server_lab_dnstt_pubkey">dnstt 伺服器公鑰</string>
+    <string name="server_lab_dnstt_transport">傳輸方式</string>
+    <string name="server_lab_dnstt_resolver">DNS 解析器</string>
+    <string name="server_lab_dnstt_dns">DoH/DoT 伺服器</string>
+    <string name="server_lab_cipher">加密演算法</string>
+    <string name="server_lab_server_dn">伺服器網域</string>
+    <string name="server_lab_ca_cert">CA 憑證</string>
+    <string name="server_lab_lightway_mode">模式</string>
     <string name="confirm_delete_visible_profiles">確定要刪除目前顯示的所有設定檔嗎？</string>
     <string name="confirm_delete_duplicate_profiles">確定要刪除目前顯示的所有重複設定檔嗎？</string>
     <string name="confirm_delete_invalid_profiles">請先測試設定檔。確定要刪除目前顯示的所有無效設定檔嗎？</string>
@@ -562,6 +577,9 @@
 
     <!-- Stratos premium UI -->
     <string name="stratos_show_password">顯示密碼</string>
+    <string name="stratos_relay_failed">連接中繼啟動失敗</string>
+    <string name="stratos_lightway_failed">Lightway 連線失敗</string>
+    <string name="stratos_lightway_vpn_only">Lightway 設定僅支援 VPN 模式連線</string>
     <string name="stratos_hide_password">隱藏密碼</string>
     <string name="stratos_server_count">%1$d 台伺服器</string>
     <string name="stratos_expanded">已展開</string>

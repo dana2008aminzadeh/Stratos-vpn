@@ -45,6 +45,21 @@
     <string name="menu_item_import_config_manually_trojan">Добавить Trojan</string>
     <string name="menu_item_import_config_manually_wireguard">Добавить WireGuard</string>
     <string name="menu_item_import_config_manually_hysteria2">Добавить Hysteria2</string>
+    <string name="menu_item_import_config_manually_ssh">Добавить [SSH]</string>
+    <string name="menu_item_import_config_manually_dnstt">Добавить [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">Добавить [Lightway]</string>
+    <string name="server_lab_ssh_auth">Аутентификация</string>
+    <string name="server_lab_private_key">Закрытый ключ</string>
+    <string name="server_lab_passphrase">Ключевая фраза</string>
+    <string name="server_lab_host_key_pin">Отпечаток ключа хоста (необязательно)</string>
+    <string name="server_lab_dnstt_pubkey">Публичный ключ сервера dnstt</string>
+    <string name="server_lab_dnstt_transport">Транспорт</string>
+    <string name="server_lab_dnstt_resolver">DNS-резолвер</string>
+    <string name="server_lab_dnstt_dns">Сервер DoH/DoT</string>
+    <string name="server_lab_cipher">Шифр</string>
+    <string name="server_lab_server_dn">Домен сервера</string>
+    <string name="server_lab_ca_cert">Сертификат CA</string>
+    <string name="server_lab_lightway_mode">Режим</string>
     <string name="confirm_delete_visible_profiles">Удалить все отображаемые профили?</string>
     <string name="confirm_delete_duplicate_profiles">Удалить все отображаемые дубликаты профилей?</string>
     <string name="confirm_delete_invalid_profiles">Выполните проверку перед удалением! Удалить все отображаемые нерабочие профили?</string>
@@ -568,6 +583,9 @@
 
     <!-- Stratos premium UI -->
     <string name="stratos_show_password">Показать пароль</string>
+    <string name="stratos_relay_failed">Не удалось запустить ретранслятор подключения</string>
+    <string name="stratos_lightway_failed">Не удалось подключиться через Lightway</string>
+    <string name="stratos_lightway_vpn_only">Профили Lightway подключаются только в режиме VPN</string>
     <string name="stratos_hide_password">Скрыть пароль</string>
     <string name="stratos_server_count">Серверов: %1$d</string>
     <string name="stratos_expanded">Развёрнуто</string>

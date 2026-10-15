@@ -203,6 +203,7 @@ object CoreConfigManager {
 
         // User routing rules (policyGroupBalancerTags rewrites TAG_PROXY→balancer when main is POLICYGROUP).
         configureRouting(configContext, v2rayConfig, policyGroupBalancerTags)
+        configureRelayEgressBypass(primaryResolvedOutbound.profile, v2rayConfig)
         configureFakeDns(v2rayConfig)
         configureDns(configContext, v2rayConfig, policyGroupBalancerTags)
         configureLocalDns(configContext, v2rayConfig)
@@ -1100,6 +1101,72 @@ object CoreConfigManager {
         }
 
         dns.hosts = newHosts
+    }
+
+    /**
+     * Sidecar relay egress (SSH session sockets, dnstt DNS packets) must leave the
+     * machine directly. In proxy-only mode those sockets never touch the core, but in
+     * root mode the routing table would send them back into the core, where the default
+     * rule would push them through the relay again — an infinite loop. Pinning the
+     * relay's remote endpoints to TAG_DIRECT prevents that.
+     */
+    private fun configureRelayEgressBypass(profile: ProfileItem, v2rayConfig: V2rayConfig) {
+        if (profile.configType != EConfigType.SSH && profile.configType != EConfigType.DNSTT) return
+
+        val targets = relayEgressTargets(profile)
+        if (targets.isEmpty()) {
+            LogUtil.w(AppConfig.TAG, "Relay egress bypass skipped: no resolvable endpoint for ${profile.remarks}")
+            return
+        }
+        val ips = mutableListOf<String>()
+        for (target in targets) {
+            if (Utils.isPureIpAddress(target)) {
+                ips.add(target)
+            } else {
+                ips.addAll(HttpUtil.resolveHostToIP(target, false).orEmpty())
+            }
+        }
+        val unique = ips.distinct()
+        if (unique.isEmpty()) {
+            LogUtil.w(AppConfig.TAG, "Relay egress bypass skipped: DNS resolution failed for ${profile.remarks}")
+            return
+        }
+        v2rayConfig.routing.rules.add(
+            V2rayConfig.RoutingBean.RulesBean(
+                ip = unique,
+                outboundTag = AppConfig.TAG_DIRECT,
+                network = "tcp,udp",
+            ),
+        )
+    }
+
+    /**
+     * Hostnames/IPs the sidecar for [profile] opens direct sockets to:
+     * the SSH server for SSH profiles, and the configured resolver (udp) or
+     * DoH/DoT target for dnstt profiles.
+     */
+    private fun relayEgressTargets(profile: ProfileItem): List<String> {
+        return when (profile.configType) {
+            EConfigType.SSH -> listOfNotNull(profile.server)
+
+            EConfigType.DNSTT -> when (profile.method?.lowercase()) {
+                com.v2ray.ang.fmt.DnsttFmt.TRANSPORT_DOH,
+                com.v2ray.ang.fmt.DnsttFmt.TRANSPORT_DOT -> {
+                    val raw = profile.path.orEmpty()
+                    val withoutScheme = raw.substringAfter("://", raw)
+                    listOf(
+                        withoutScheme.substringBefore("/")
+                            .substringBefore(":")
+                            .substringBefore("%")
+                            .takeIf { it.isNotBlank() },
+                    )
+                }
+
+                else -> listOf(profile.host ?: com.v2ray.ang.fmt.DnsttFmt.DEFAULT_RESOLVER_HOST)
+            }
+
+            else -> emptyList()
+        }
     }
 
     /**
