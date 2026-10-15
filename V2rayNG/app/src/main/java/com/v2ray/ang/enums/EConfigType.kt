@@ -14,6 +14,9 @@ enum class EConfigType(val value: Int, val protocolScheme: String) {
     //    TUIC(8, AppConfig.TUIC),
     HYSTERIA2(9, AppConfig.HYSTERIA2),
     HYSTERIA(900, AppConfig.HYSTERIA),
+    DNSTT(11, AppConfig.DNSTT),
+    LIGHTWAY(12, AppConfig.LIGHTWAY),
+    SSH(13, AppConfig.SSH),
     HTTP(10, AppConfig.HTTP),
     POLICYGROUP(101, AppConfig.CUSTOM),
     PROXYCHAIN(102, AppConfig.CUSTOM);

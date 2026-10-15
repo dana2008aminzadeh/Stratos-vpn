@@ -13,6 +13,9 @@ import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.CustomFmt
+import com.v2ray.ang.fmt.DnsttFmt
+import com.v2ray.ang.fmt.LightwayFmt
+import com.v2ray.ang.fmt.SshFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
 import com.v2ray.ang.fmt.SocksFmt
@@ -46,6 +49,9 @@ object AngConfigManager {
             EConfigType.TROJAN.protocolScheme to TrojanFmt::parse,
             EConfigType.VLESS.protocolScheme to VlessFmt::parse,
             EConfigType.WIREGUARD.protocolScheme to WireguardFmt::parse,
+            EConfigType.DNSTT.protocolScheme to DnsttFmt::parse,
+            EConfigType.LIGHTWAY.protocolScheme to LightwayFmt::parse,
+            EConfigType.SSH.protocolScheme to SshFmt::parse,
             EConfigType.HYSTERIA2.protocolScheme to Hysteria2Fmt::parse,
             AppConfig.HY2 to Hysteria2Fmt::parse,
         )
@@ -162,6 +168,9 @@ object AngConfigManager {
                 EConfigType.VLESS -> VlessFmt.toUri(config)
                 EConfigType.TROJAN -> TrojanFmt.toUri(config)
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
+                EConfigType.DNSTT -> DnsttFmt.toUri(config)
+                EConfigType.LIGHTWAY -> LightwayFmt.toUri(config)
+                EConfigType.SSH -> SshFmt.toUri(config)
                 EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
                 else -> {}
             }

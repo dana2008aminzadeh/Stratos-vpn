@@ -23,7 +23,10 @@ private enum class ImportMenuAction(@StringRes val labelRes: Int, val action: Ma
     Http(R.string.menu_item_import_config_manually_http, MainAction.ImportManually(EConfigType.HTTP.value)),
     Trojan(R.string.menu_item_import_config_manually_trojan, MainAction.ImportManually(EConfigType.TROJAN.value)),
     WireGuard(R.string.menu_item_import_config_manually_wireguard, MainAction.ImportManually(EConfigType.WIREGUARD.value)),
-    Hysteria2(R.string.menu_item_import_config_manually_hysteria2, MainAction.ImportManually(EConfigType.HYSTERIA2.value))
+    Hysteria2(R.string.menu_item_import_config_manually_hysteria2, MainAction.ImportManually(EConfigType.HYSTERIA2.value)),
+    Dnstt(R.string.menu_item_import_config_manually_dnstt, MainAction.ImportManually(EConfigType.DNSTT.value)),
+    Lightway(R.string.menu_item_import_config_manually_lightway, MainAction.ImportManually(EConfigType.LIGHTWAY.value)),
+    Ssh(R.string.menu_item_import_config_manually_ssh, MainAction.ImportManually(EConfigType.SSH.value))
 }
 
 enum class MainMoreMenuAction(@StringRes val labelRes: Int) {
