@@ -113,6 +113,13 @@ jobs:
           echo "DEBUG_KEYSTORE_USED=true" >> $GITHUB_ENV
         fi
 
+    - name: Run unit tests
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        echo "sdk.dir=${ANDROID_HOME}" > local.properties
+        chmod 755 gradlew
+        ./gradlew :app:testPlaystoreDebugUnitTest
+
     - name: Build APK
       run: |
         cd ${{ github.workspace }}/V2rayNG
