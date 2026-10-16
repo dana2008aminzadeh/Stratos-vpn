@@ -363,8 +363,8 @@ object SshRelay {
             val channel = sshSession.openChannel("direct-tcpip") as ChannelDirectTCPIP
             channel.setHost(target.host)
             channel.setPort(target.port)
-            channel.setOriginatorIPAddress(client.inetAddress?.hostAddress ?: AppConfig.LOOPBACK)
-            channel.setOriginatorPort(client.port)
+            channel.setOrgIPAddress(client.inetAddress?.hostAddress ?: AppConfig.LOOPBACK)
+            channel.setOrgPort(client.port)
             try {
                 channel.connect(CONNECT_TIMEOUT_MS)
             } catch (e: Exception) {
