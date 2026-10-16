@@ -193,11 +193,8 @@ jobs:
           printf '%s\n' "$out" | grep -E "(AssertionError|expected:<|Exception:)" | head -n 5 | while IFS= read -r line; do
             printf '::error title=Test failure::%s\n' "${line:0:400}"
           done
-          printf '%s\n' "$out" | grep -E "FAILED$" | head -n 3 | while IFS= read -r line; do
+          printf '%s\n' "$out" | grep -E "FAILED$" | head -n 4 | while IFS= read -r line; do
             printf '::error title=Test failed::%s\n' "${line:0:400}"
-          done
-          printf '%s\n' "$out" | grep -E "(^e: |FAILURE:|What went wrong:)" | head -n 1 | while IFS= read -r line; do
-            printf '::error title=Gradle::%s\n' "${line:0:400}"
           done
           exit 1
         fi
