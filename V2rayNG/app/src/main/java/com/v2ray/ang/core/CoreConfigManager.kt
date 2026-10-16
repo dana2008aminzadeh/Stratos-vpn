@@ -1154,7 +1154,7 @@ object CoreConfigManager {
                 com.v2ray.ang.fmt.DnsttFmt.TRANSPORT_DOT -> {
                     val raw = profile.path.orEmpty()
                     val withoutScheme = raw.substringAfter("://", raw)
-                    listOf(
+                    listOfNotNull(
                         withoutScheme.substringBefore("/")
                             .substringBefore(":")
                             .substringBefore("%")

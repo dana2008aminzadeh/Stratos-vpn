@@ -1,6 +1,6 @@
 package com.v2ray.ang.relay
 
-import com.jcraft.jsch.ChannelDirectTcpip
+import com.jcraft.jsch.ChannelDirectTCPIP
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.Session
 import com.v2ray.ang.AppConfig
@@ -197,7 +197,6 @@ object SshRelay {
             ssh.setConfig("PreferredAuthentications", if (useKeyAuth) "publickey,password" else "password,keyboard-interactive")
             ssh.setServerAliveInterval(SERVER_ALIVE_INTERVAL_MS)
             ssh.setServerAliveCountMax(SESSION_ALIVE_COUNT_MAX)
-            ssh.setTcpKeepAlive(true)
             if (!useKeyAuth) {
                 ssh.setPassword(password)
             }
@@ -346,7 +345,7 @@ object SshRelay {
             }
             if (total < 0 || total < full.size) return
             if (full.size < total) {
-                full = full + readFullyOrNull(input, total - full.size) ?: return
+                full = full + (readFullyOrNull(input, total - full.size) ?: return)
             }
 
             val target = Socks5Protocol.parseConnectRequest(full) ?: run {
@@ -361,7 +360,7 @@ object SshRelay {
                 return
             }
 
-            val channel = sshSession.openChannel("direct-tcpip") as ChannelDirectTcpip
+            val channel = sshSession.openChannel("direct-tcpip") as ChannelDirectTCPIP
             channel.setHost(target.host)
             channel.setPort(target.port)
             channel.setOriginatorIPAddress(client.inetAddress?.hostAddress ?: AppConfig.LOOPBACK)
@@ -395,7 +394,7 @@ object SshRelay {
             e.cause?.message?.contains("Connection refused", ignoreCase = true) == true
 
     /** Copies bytes in both directions until either side closes. */
-    private fun pump(channel: ChannelDirectTcpip, client: Socket, input: InputStream, output: OutputStream) {
+    private fun pump(channel: ChannelDirectTCPIP, client: Socket, input: InputStream, output: OutputStream) {
         val channelIn = channel.getInputStream()
         val channelOut = channel.getOutputStream()
         val up = Thread({

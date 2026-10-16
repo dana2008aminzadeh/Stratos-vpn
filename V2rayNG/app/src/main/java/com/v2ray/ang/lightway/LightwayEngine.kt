@@ -3,7 +3,6 @@ package com.v2ray.ang.lightway
 import android.app.Service
 import android.net.VpnService
 import android.os.Process
-import android.os.TrafficStats
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
@@ -105,7 +104,7 @@ object LightwayEngine {
                 connection = conn
                 val result = conn.parallelConnect(lightwayEventHandler(appService), tunFd, yaml)
                 LogUtil.i(AppConfig.TAG, "Lightway session ended: $result")
-                if (result == ClientResult.NetworkChange) {
+                if (result == ClientResult.NETWORK_CHANGE) {
                     // The transport cannot survive this network change by itself; surface
                     // a clean disconnect so the user (or the auto-connect path) reconnects.
                     LogUtil.w(AppConfig.TAG, "Lightway ended after a network change")
@@ -159,13 +158,36 @@ object LightwayEngine {
         }
     }
 
-    /** Cumulative (since boot) uid counters for the speed/usage loop. */
+    /**
+     * Cumulative (since boot) uid counters for the speed/usage loop.
+     *
+     * The `TrafficStats` uid getters are not visible on the API 37 compile classpath,
+     * so they are looked up reflectively: shipped devices still provide them, and a
+     * platform that finally drops them degrades the readout to zeros instead of the
+     * whole engine failing to compile or run.
+     */
     private val uidTrafficSource: () -> Pair<Long, Long> = {
-        val uid = Process.myUid()
-        val tx = TrafficStats.getUidTxBytes(uid)
-        val rx = TrafficStats.getUidRxBytes(uid)
-        (if (tx >= 0) tx else 0L) to (if (rx >= 0) rx else 0L)
+        readUidTraffic()
     }
+
+    private fun readUidTraffic(): Pair<Long, Long> {
+        return try {
+            val cls = Class.forName("android.os.TrafficStats")
+            val uid = Process.myUid()
+            val intType = Integer.TYPE
+            val tx = cls.getMethod("getUidTxBytes", intType).invoke(null, uid) as Long
+            val rx = cls.getMethod("getUidRxBytes", intType).invoke(null, uid) as Long
+            (if (tx >= 0) tx else 0L) to (if (rx >= 0) rx else 0L)
+        } catch (e: Exception) {
+            if (!trafficStatsUnavailableLogged) {
+                trafficStatsUnavailableLogged = true
+                LogUtil.w(AppConfig.TAG, "uid traffic counters unavailable: ${e.javaClass.simpleName}")
+            }
+            0L to 0L
+        }
+    }
+
+    private var trafficStatsUnavailableLogged = false
 
     private fun lightwayEventHandler(ctx: Service): EventHandlers = object : EventHandlers {
         override fun handleStatusChange(state: UByte) {
