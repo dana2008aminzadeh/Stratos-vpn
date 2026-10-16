@@ -3,6 +3,7 @@ package com.v2ray.ang.fmt
 import com.v2ray.ang.enums.EConfigType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SshFmtTest {
@@ -49,6 +50,17 @@ class SshFmtTest {
         assertNull(SshFmt.parse("ssh://user@"))
         assertNull(SshFmt.parse("ssh://:pw@example.com"))
         assertNull(SshFmt.parse("ssh://example.com"))
+    }
+
+    @Test
+    fun `encode probe keeps base64 userinfo`() {
+        assertEquals(
+            "YWxpY2U6czNjcmV0",
+            com.v2ray.ang.util.Utils.encode("alice:s3cret", true),
+        )
+        val original = SshFmt.parse("ssh://alice:s3cret@ssh.example.com:2222#My%20SSH")!!
+        val body = SshFmt.toUri(original)
+        assertTrue("toUri body without userinfo: $body", body.startsWith("YWxpY2U6czNjcmV0@"))
     }
 
     @Test
