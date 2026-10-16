@@ -182,7 +182,22 @@ jobs:
     - name: Run unit tests
       run: |
         cd ${{ github.workspace }}/V2rayNG
-        ./gradlew :app:testPlaystoreDebugUnitTest
+        if out=$(./gradlew --no-daemon :app:testPlaystoreDebugUnitTest 2>&1); then
+          echo "$out" | tail -n 25
+        else
+          status=$?
+          echo "$out" | tail -n 250
+          echo "::error title=Unit tests::gradlew :app:testPlaystoreDebugUnitTest failed (exit $status)"
+          printf '%s\n' "$out" | grep -E "(^e: |error: |FAILURE:|What went wrong:|Caused by:|FAILED$)" | head -n 60 | while IFS= read -r line; do
+            printf '::error title=Gradle::%s\n' "${line:0:400}"
+          done
+          if [ -d app/build/test-results ]; then
+            find app/build/test-results -name '*.xml' -exec grep -H -E "<(failure|error)" {} \; | head -n 40 | while IFS= read -r line; do
+              printf '::error title=Test failure::%s\n' "${line:0:400}"
+            done
+          fi
+          exit 1
+        fi
 
     - name: Build APK
       run: |
