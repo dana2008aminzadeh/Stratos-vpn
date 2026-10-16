@@ -48,7 +48,8 @@ class LightwayFmtTest {
     @Test
     fun `round trip preserves the profile`() {
         val original = LightwayFmt.parse("lightway://alice:s3cret@lw.example.com:27690?dn=lw.example.com&mode=udp&cipher=aes128#LW")!!
-        val back = LightwayFmt.parse(EConfigType.LIGHTWAY.protocolScheme + LightwayFmt.toUri(original))!!
+        val back = LightwayFmt.parse(EConfigType.LIGHTWAY.protocolScheme + LightwayFmt.toUri(original))
+            ?: error("lightway round trip parse returned null; uri=${EConfigType.LIGHTWAY.protocolScheme + LightwayFmt.toUri(original)}")
         assertEquals(original.server, back.server)
         assertEquals(original.serverPort, back.serverPort)
         assertEquals(original.username, back.username)
