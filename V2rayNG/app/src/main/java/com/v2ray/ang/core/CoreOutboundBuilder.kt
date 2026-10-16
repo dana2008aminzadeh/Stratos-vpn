@@ -10,6 +10,7 @@ import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.stratos.engine.StratosEngineManager
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -32,6 +33,11 @@ object CoreOutboundBuilder {
             EConfigType.WIREGUARD -> toOutboundWireguard(profileItem)
             EConfigType.HYSTERIA2 -> toOutboundHysteria2(profileItem)
             EConfigType.HTTP -> toOutboundHttp(profileItem)
+            EConfigType.SSH,
+            EConfigType.DNSTT,
+            EConfigType.LIGHTWAY,
+            -> toOutboundLocalEngine(profileItem)
+
             else -> null
         }
 
@@ -230,6 +236,23 @@ object CoreOutboundBuilder {
                 settings.user = profileItem.username.orEmpty()
                 settings.pass = profileItem.password.orEmpty()
             }
+        }
+
+        return outboundBean
+    }
+
+    /**
+     * Outbound for profile types carried by a local engine (SSH and friends):
+     * a SOCKS5 connection to the engine's loopback front-end. The engine runs
+     * in the daemon process and dials the real upstream itself.
+     */
+    private fun toOutboundLocalEngine(profileItem: ProfileItem): OutboundBean? {
+        val outboundBean = createInitOutbound(EConfigType.SOCKS)
+
+        outboundBean?.settings?.let { settings ->
+            settings.address = StratosEngineManager.ENGINE_HOST
+            settings.port = StratosEngineManager.ENGINE_PORT
+            settings.level = AppConfig.DEFAULT_LEVEL
         }
 
         return outboundBean

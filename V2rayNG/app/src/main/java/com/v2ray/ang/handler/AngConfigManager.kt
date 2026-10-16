@@ -13,9 +13,12 @@ import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.fmt.CustomFmt
+import com.v2ray.ang.fmt.DnsttFmt
 import com.v2ray.ang.fmt.Hysteria2Fmt
+import com.v2ray.ang.fmt.LightwayFmt
 import com.v2ray.ang.fmt.ShadowsocksFmt
 import com.v2ray.ang.fmt.SocksFmt
+import com.v2ray.ang.fmt.SshFmt
 import com.v2ray.ang.fmt.TrojanFmt
 import com.v2ray.ang.fmt.V2rayNFmt
 import com.v2ray.ang.fmt.VlessFmt
@@ -48,6 +51,10 @@ object AngConfigManager {
             EConfigType.WIREGUARD.protocolScheme to WireguardFmt::parse,
             EConfigType.HYSTERIA2.protocolScheme to Hysteria2Fmt::parse,
             AppConfig.HY2 to Hysteria2Fmt::parse,
+            EConfigType.DNSTT.protocolScheme to DnsttFmt::parse,
+            EConfigType.LIGHTWAY.protocolScheme to LightwayFmt::parse,
+            AppConfig.LIGHTWAY_SHORT to LightwayFmt::parse,
+            EConfigType.SSH.protocolScheme to SshFmt::parse,
         )
     }
 
@@ -163,6 +170,9 @@ object AngConfigManager {
                 EConfigType.TROJAN -> TrojanFmt.toUri(config)
                 EConfigType.WIREGUARD -> WireguardFmt.toUri(config)
                 EConfigType.HYSTERIA2 -> Hysteria2Fmt.toUri(config)
+                EConfigType.DNSTT -> DnsttFmt.toUri(config)
+                EConfigType.LIGHTWAY -> LightwayFmt.toUri(config)
+                EConfigType.SSH -> SshFmt.toUri(config)
                 else -> {}
             }
         } catch (e: Exception) {
@@ -201,6 +211,27 @@ object AngConfigManager {
         } catch (e: ProfileStorageException) {
             LogUtil.e(AppConfig.TAG, "Failed to store imported profiles", e)
             0 to 0
+        }
+    }
+
+    /**
+     * Imports the bundled Stratos test profile (assets/stratos_test_config.json)
+     * as a custom full-config server, so the connection path can be exercised
+     * with one tap.
+     *
+     * @param context The context used to read the asset.
+     * @param subid The destination subscription ID.
+     * @return The number of imported configs (1 on success, 0 on failure).
+     */
+    fun importStratosTestConfig(context: Context, subid: String): Int {
+        return try {
+            val json = context.assets.open(AppConfig.STRATOS_TEST_CONFIG_ASSET)
+                .bufferedReader()
+                .use { it.readText() }
+            importBatchConfig(json, subid, true).first
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to import Stratos test config", e)
+            0
         }
     }
 

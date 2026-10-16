@@ -561,4 +561,31 @@
     <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
     <string name="value_unknown">ناشناخته</string>
 
+    <string name="menu_item_import_config_manually_dnstt">افزودن [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">افزودن [Lightway]</string>
+    <string name="menu_item_import_config_manually_ssh">افزودن [SSH]</string>
+    <string name="server_lab_dnstt_pubkey">کلید عمومی سرور</string>
+    <string name="server_lab_dnstt_pubkey_hint">۶۴ نویسهٔ هگز (خروجی dnstt-server -gen-key)</string>
+    <string name="server_lab_dnstt_resolver">ریزالور DNS</string>
+    <string name="server_lab_dnstt_resolver_hint">udp:1.1.1.1، tls:1.1.1.1[:853] یا نشانی DoH</string>
+    <string name="server_lab_tunnel_mtu">MTU (اختیاری، پیش‌فرض ۱۲۸۰)</string>
+    <string name="server_lab_lightway_proto">انتقال</string>
+    <string name="server_lab_lightway_cipher">رمزنگاری</string>
+    <string name="server_lab_lightway_obfs">رمز عبور مبهم‌سازی (اختیاری)</string>
+    <string name="server_lab_ssh_auth">احراز هویت</string>
+    <string name="server_lab_ssh_username">نام کاربری</string>
+    <string name="server_lab_ssh_password">رمز عبور</string>
+    <string name="server_lab_ssh_private_key">کلید خصوصی (PEM)</string>
+    <string name="server_lab_ssh_private_key_hint">کلید خصوصی PEM سبک OpenSSH یا PKCS#8</string>
+    <string name="server_lab_ssh_host_key">اثر انگشت کلید میزبان (اختیاری)</string>
+    <string name="server_lab_ssh_host_key_hint">SHA256:... یا MD5:...؛ برای اعتماد در اولین اتصال خالی بگذارید</string>
+    <string name="server_lab_ssh_insecure_hint">رد کردن بررسی کلید میزبان سرور</string>
+
+    <string name="menu_item_import_config_test">افزودن کانفیگ تستی</string>
+
+    <string name="stratos_engine_not_bundled">موتور تونل %1$s هنوز در این نسخه قرار نگرفته است.</string>
+
+    <string name="stratos_settings_profiles">پروفایل‌ها و کانفیگ تستی</string>
+    <string name="stratos_settings_profiles_desc">مدیریت سرورها، افزودن کانفیگ و حالت پیشرفته</string>
+
 </resources>

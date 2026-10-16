@@ -577,4 +577,31 @@
     <string name="stratos_expanded">موسّع</string>
     <string name="stratos_collapsed">مطوي</string>
     <string name="stratos_powered_by">مدعوم بواسطة v2rayNG • GPLv3</string>
+    <string name="menu_item_import_config_manually_dnstt">إضافة [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">إضافة [Lightway]</string>
+    <string name="menu_item_import_config_manually_ssh">إضافة [SSH]</string>
+    <string name="server_lab_dnstt_pubkey">المفتاح العام للخادم</string>
+    <string name="server_lab_dnstt_pubkey_hint">٦٤ حرفًا ست عشريًا (ناتج dnstt-server -gen-key)</string>
+    <string name="server_lab_dnstt_resolver">محلّل DNS</string>
+    <string name="server_lab_dnstt_resolver_hint">udp:1.1.1.1 أو tls:1.1.1.1[:853] أو عنوان DoH</string>
+    <string name="server_lab_tunnel_mtu">MTU (اختياري، الافتراضي ١٢٨٠)</string>
+    <string name="server_lab_lightway_proto">النقل</string>
+    <string name="server_lab_lightway_cipher">التشفير</string>
+    <string name="server_lab_lightway_obfs">كلمة مرور التعتيم (اختياري)</string>
+    <string name="server_lab_ssh_auth">المصادقة</string>
+    <string name="server_lab_ssh_username">اسم المستخدم</string>
+    <string name="server_lab_ssh_password">كلمة المرور</string>
+    <string name="server_lab_ssh_private_key">المفتاح الخاص (PEM)</string>
+    <string name="server_lab_ssh_private_key_hint">مفتاح خاص بصيغة PEM (OpenSSH أو PKCS#8)</string>
+    <string name="server_lab_ssh_host_key">بصمة مفتاح المضيف (اختياري)</string>
+    <string name="server_lab_ssh_host_key_hint">SHA256:... أو MD5:...؛ اتركه فارغًا للثقة عند أول استخدام</string>
+    <string name="server_lab_ssh_insecure_hint">تخطي التحقق من مفتاح مضيف الخادم</string>
+
+    <string name="menu_item_import_config_test">استيراد إعدادات الاختبار</string>
+
+    <string name="stratos_engine_not_bundled">محرك النفق %1$s غير مضمّن في هذا الإصدار بعد.</string>
+
+    <string name="stratos_settings_profiles">الملفات الشخصية وإعدادات الاختبار</string>
+    <string name="stratos_settings_profiles_desc">إدارة الخوادم واستيراد الإعدادات وفتح الوضع المتقدم</string>
+
 </resources>

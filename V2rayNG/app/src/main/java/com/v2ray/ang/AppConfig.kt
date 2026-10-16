@@ -223,6 +223,30 @@ object AppConfig {
     const val HYSTERIA2 = "hysteria2://"
     const val HY2 = "hy2://"
     const val V2RAYNFMTS = "v2rayn://"
+    const val DNSTT = "dnstt://"
+    const val LIGHTWAY = "lightway://"
+    const val LIGHTWAY_SHORT = "lw://"
+    const val SSH = "ssh://"
+
+    /** Stratos extra-protocol defaults. */
+    const val DNSTT_DEFAULT_RESOLVER = "udp:1.1.1.1"
+    const val DNSTT_DEFAULT_RESOLVER_PORT = "53"
+    const val STRATOS_TEST_CONFIG_ASSET = "stratos_test_config.json"
+
+    /** Loopback SOCKS port of the built-in data-plane engines (SSH, …). */
+    const val ENGINE_LOOP_PORT = 10889
+    const val DNSTT_DEFAULT_MTU = 1280
+    const val DNSTT_RESOLVER_UDP = "udp"
+    const val DNSTT_RESOLVER_TLS = "tls"
+    const val DNSTT_RESOLVER_DOH = "doh"
+    const val LIGHTWAY_DEFAULT_MTU = 1280
+    const val LIGHTWAY_CIPHER_AES = "aes-256-gcm"
+    const val LIGHTWAY_CIPHER_CHACHA = "chacha20-poly1305"
+    const val LIGHTWAY_PROTO_UDP = "udp"
+    const val LIGHTWAY_PROTO_TCP = "tcp"
+    const val SSH_DEFAULT_PORT = "22"
+    const val SSH_AUTH_PASSWORD = "password"
+    const val SSH_AUTH_KEY = "key"
 
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"

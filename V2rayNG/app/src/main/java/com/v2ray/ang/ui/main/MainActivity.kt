@@ -33,12 +33,15 @@ import com.v2ray.ang.ui.perappproxy.PerAppProxyActivity
 import com.v2ray.ang.ui.routing.RoutingSettingActivity
 import com.v2ray.ang.ui.server.ProfileEditorResult
 import com.v2ray.ang.ui.server.ServerCustomConfigActivity
+import com.v2ray.ang.ui.server.ServerDnsttActivity
 import com.v2ray.ang.ui.server.ServerGroupActivity
 import com.v2ray.ang.ui.server.ServerHttpActivity
 import com.v2ray.ang.ui.server.ServerHysteria2Activity
+import com.v2ray.ang.ui.server.ServerLightwayActivity
 import com.v2ray.ang.ui.server.ServerProxyChainActivity
 import com.v2ray.ang.ui.server.ServerShadowsocksActivity
 import com.v2ray.ang.ui.server.ServerSocksActivity
+import com.v2ray.ang.ui.server.ServerSshActivity
 import com.v2ray.ang.ui.server.ServerTrojanActivity
 import com.v2ray.ang.ui.server.ServerVlessActivity
 import com.v2ray.ang.ui.server.ServerVmessActivity
@@ -109,6 +112,7 @@ class MainActivity : HelperBaseComponentActivity() {
                     MainAction.ImportQRcode -> importQRcode()
                     MainAction.ImportClipboard -> importClipboard()
                     MainAction.ImportConfigLocal -> importConfigLocal()
+                    MainAction.ImportTestConfig -> importStratosTestConfig()
                     is MainAction.ImportManually -> importManually(action.type)
                     MainAction.RestartService -> LauncherManager.restartServiceOrStart(this, ::requestServiceStart)
                     MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
@@ -205,6 +209,9 @@ class MainActivity : HelperBaseComponentActivity() {
             EConfigType.TROJAN.value -> Intent(this, ServerTrojanActivity::class.java)
             EConfigType.WIREGUARD.value -> Intent(this, ServerWireguardActivity::class.java)
             EConfigType.HYSTERIA2.value -> Intent(this, ServerHysteria2Activity::class.java)
+            EConfigType.DNSTT.value -> Intent(this, ServerDnsttActivity::class.java)
+            EConfigType.LIGHTWAY.value -> Intent(this, ServerLightwayActivity::class.java)
+            EConfigType.SSH.value -> Intent(this, ServerSshActivity::class.java)
             else -> Intent(this, ServerHttpActivity::class.java).apply {
                 putExtra("createConfigType", createConfigType)
             }
@@ -244,6 +251,17 @@ class MainActivity : HelperBaseComponentActivity() {
         }
     }
 
+    private fun importStratosTestConfig() {
+        try {
+            val json = assets.open(AppConfig.STRATOS_TEST_CONFIG_ASSET)
+                .bufferedReader()
+                .use { it.readText() }
+            mainViewModel.onAction(MainAction.ImportBatchConfig(json))
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "Failed to read Stratos test config asset", e)
+        }
+    }
+
     private fun editServer(guid: String, profile: ProfileItem) {
         val activityClass = when (profile.configType) {
             EConfigType.CUSTOM -> ServerCustomConfigActivity::class.java
@@ -257,6 +275,9 @@ class MainActivity : HelperBaseComponentActivity() {
             EConfigType.TROJAN -> ServerTrojanActivity::class.java
             EConfigType.WIREGUARD -> ServerWireguardActivity::class.java
             EConfigType.HYSTERIA2 -> ServerHysteria2Activity::class.java
+            EConfigType.DNSTT -> ServerDnsttActivity::class.java
+            EConfigType.LIGHTWAY -> ServerLightwayActivity::class.java
+            EConfigType.SSH -> ServerSshActivity::class.java
             else -> ServerHttpActivity::class.java
         }
         val intent = Intent(this, activityClass).apply {

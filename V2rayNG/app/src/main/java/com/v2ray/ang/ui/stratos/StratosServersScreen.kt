@@ -3,6 +3,7 @@ package com.v2ray.ang.ui.stratos
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.v2ray.ang.R
+import com.v2ray.ang.stratos.StratosServer
 import com.v2ray.ang.stratos.StratosServersStore
 import kotlinx.coroutines.flow.StateFlow
 
@@ -98,6 +100,28 @@ fun StratosServersScreen(
                         )
                     },
                     actions = {
+                        StratosIconAction(
+                            icon = R.drawable.ic_stratos_refresh_24,
+                            contentDescription = stringResource(R.string.stratos_refresh),
+                            onClick = { onAction(StratosServersAction.Refresh) },
+                            enabled = !state.isRefreshing,
+                            modifier = Modifier.padding(end = 6.dp),
+                        ) {
+                            if (state.isRefreshing) {
+                                CircularProgressIndicator(
+                                    Modifier.size(18.dp),
+                                    color = StratosColors.Cyan,
+                                    strokeWidth = 2.dp,
+                                )
+                            } else {
+                                Icon(
+                                    painterResource(R.drawable.ic_stratos_refresh_24),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
+                        }
                         StratosIconAction(
                             icon = R.drawable.ic_stratos_ping_24,
                             contentDescription = stringResource(R.string.stratos_test_all_ping),
@@ -166,7 +190,7 @@ fun StratosServersScreen(
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(14.dp))
 
                 if (state.isEmpty && !state.isRefreshing) {
                     StratosEmptyServers(
@@ -181,8 +205,8 @@ fun StratosServersScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 4.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(11.dp),
                     ) {
                         items(
                             items = state.groups,
@@ -252,10 +276,11 @@ private fun StratosCountryCard(
     selectedGuid: String?,
     isTesting: Boolean,
     onToggle: () -> Unit,
-    onSelect: (com.v2ray.ang.stratos.StratosServer) -> Unit,
+    onSelect: (StratosServer) -> Unit,
 ) {
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
+        animationSpec = tween(220),
         label = "countryChevron",
     )
     val containsSelection = group.servers.any { it.guid == selectedGuid }
@@ -268,13 +293,14 @@ private fun StratosCountryCard(
             .fillMaxWidth()
             .then(
                 if (containsSelection) Modifier.border(
-                    1.dp,
-                    StratosColors.Cyan.copy(alpha = 0.32f),
+                    1.2.dp,
+                    StratosColors.Cyan.copy(alpha = 0.42f),
                     RoundedCornerShape(22.dp),
                 ) else Modifier,
             )
             .animateContentSize(),
         shape = RoundedCornerShape(22.dp),
+        glow = if (containsSelection) StratosColors.Cyan else StratosColors.Indigo,
     ) {
         Column {
             Row(
@@ -286,17 +312,30 @@ private fun StratosCountryCard(
                         role = Role.Button
                         stateDescription = expansionState
                     }
-                    .padding(horizontal = 15.dp, vertical = 14.dp),
+                    .padding(horizontal = 15.dp, vertical = 13.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.72f),
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.size(44.dp),
+                // gradient flag tile
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.linearGradient(
+                                listOf(
+                                    StratosColors.Sky.copy(alpha = 0.20f),
+                                    StratosColors.Indigo.copy(alpha = 0.24f),
+                                ),
+                            ),
+                            RoundedCornerShape(14.dp),
+                        )
+                        .border(
+                            1.dp,
+                            StratosColors.SoftIndigo.copy(alpha = 0.28f),
+                            RoundedCornerShape(14.dp),
+                        ),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(group.flag(), fontSize = 23.sp)
-                    }
+                    Text(group.flag(), fontSize = 24.sp)
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
@@ -341,9 +380,7 @@ private fun StratosCountryCard(
                 exit = shrinkVertically(),
             ) {
                 Column {
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.48f),
-                    )
+                    StratosDivider()
                     group.servers.forEach { row ->
                         StratosServerRowItem(
                             row = row,
@@ -367,7 +404,7 @@ private fun StratosServerRowItem(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                if (selected) StratosColors.Cyan.copy(alpha = 0.08f) else Color.Transparent,
+                if (selected) StratosColors.Cyan.copy(alpha = 0.09f) else Color.Transparent,
             )
             .clickable(role = Role.RadioButton, onClick = onClick)
             .semantics(mergeDescendants = true) {
@@ -384,14 +421,22 @@ private fun StratosServerRowItem(
         )
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
-            Text(
-                row.remark.ifBlank { row.server.name },
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                color = if (selected) StratosColors.Cyan else MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    row.remark.ifBlank { row.server.name },
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                    color = if (selected) StratosColors.Cyan else MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                val proto = protocolLabel(row.server.config)
+                if (proto != null) {
+                    Spacer(Modifier.width(6.dp))
+                    StratosPill(proto, tint = protocolTint(proto))
+                }
+            }
             if (row.server.tags.isNotEmpty()) {
                 Spacer(Modifier.height(5.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -444,7 +489,7 @@ private fun StratosPingBadge(delayMs: Long) {
         else -> MaterialTheme.colorScheme.error
     }
     Surface(
-        color = color.copy(alpha = 0.10f),
+        color = color.copy(alpha = 0.12f),
         shape = RoundedCornerShape(50),
     ) {
         Row(
@@ -466,6 +511,35 @@ private fun StratosPingBadge(delayMs: Long) {
             )
         }
     }
+}
+
+/** Short protocol label derived from the share link scheme. */
+private fun protocolLabel(config: String): String? {
+    val scheme = config.substringBefore("://", "").lowercase()
+    return when (scheme) {
+        "vmess" -> "VMess"
+        "vless" -> "VLESS"
+        "ss" -> "SS"
+        "trojan" -> "Trojan"
+        "wireguard", "wg" -> "WG"
+        "hysteria2", "hy2" -> "HY2"
+        "hysteria" -> "HY"
+        "socks", "socks4", "socks5" -> "SOCKS"
+        "http", "https" -> "HTTP"
+        "dnstt" -> "DNSTT"
+        "lightway", "lw" -> "Lightway"
+        "ssh" -> "SSH"
+        else -> null
+    }
+}
+
+@Composable
+private fun protocolTint(proto: String): Color = when (proto) {
+    "DNSTT" -> StratosColors.Cyan
+    "WG" -> StratosColors.Success
+    "Lightway" -> StratosColors.SoftIndigo
+    "SSH" -> StratosColors.Warning
+    else -> StratosColors.Mist
 }
 
 private fun StratosCountryGroup.flag(): String =

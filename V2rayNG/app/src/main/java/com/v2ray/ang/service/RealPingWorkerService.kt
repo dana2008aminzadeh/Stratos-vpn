@@ -111,6 +111,9 @@ class RealPingWorkerService(
         if (!config.configType.isComplexType()
             && config.configType != EConfigType.HYSTERIA2
             && config.configType != EConfigType.WIREGUARD
+            && config.configType != EConfigType.DNSTT
+            && config.configType != EConfigType.LIGHTWAY
+            && config.configType != EConfigType.SSH
             && config.alpn?.startsWith("h3") != true
             && config.server.isNotNullEmpty()
             && config.serverPort?.toIntOrNull() != null
@@ -139,6 +142,9 @@ class RealPingWorkerService(
         if (!config.configType.isComplexType()
             && config.configType != EConfigType.HYSTERIA2
             && config.configType != EConfigType.WIREGUARD
+            && config.configType != EConfigType.DNSTT
+            && config.configType != EConfigType.LIGHTWAY
+            && config.configType != EConfigType.SSH
             && config.alpn?.split(',')?.all { it.trim().startsWith("h3") } != true
             && config.server.isNotNullEmpty()
             && config.serverPort?.toIntOrNull() != null

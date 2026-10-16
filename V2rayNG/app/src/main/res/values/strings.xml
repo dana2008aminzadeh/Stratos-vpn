@@ -561,4 +561,31 @@
     <string name="connection_test_empty_message">no details available</string>
     <string name="value_unknown">unknown</string>
 
+    <string name="menu_item_import_config_manually_dnstt">Add [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">Add [Lightway]</string>
+    <string name="menu_item_import_config_manually_ssh">Add [SSH]</string>
+    <string name="server_lab_dnstt_pubkey">Server public key</string>
+    <string name="server_lab_dnstt_pubkey_hint">64 hex characters (output of dnstt-server -gen-key)</string>
+    <string name="server_lab_dnstt_resolver">DNS resolver</string>
+    <string name="server_lab_dnstt_resolver_hint">udp:1.1.1.1, tls:1.1.1.1[:853] or a DoH URL</string>
+    <string name="server_lab_tunnel_mtu">MTU (optional, default 1280)</string>
+    <string name="server_lab_lightway_proto">Transport</string>
+    <string name="server_lab_lightway_cipher">Cipher</string>
+    <string name="server_lab_lightway_obfs">Obfuscation password (optional)</string>
+    <string name="server_lab_ssh_auth">Authentication</string>
+    <string name="server_lab_ssh_username">Username</string>
+    <string name="server_lab_ssh_password">Password</string>
+    <string name="server_lab_ssh_private_key">Private key (PEM)</string>
+    <string name="server_lab_ssh_private_key_hint">OpenSSH or PKCS#8 PEM private key</string>
+    <string name="server_lab_ssh_host_key">Host key fingerprint (optional)</string>
+    <string name="server_lab_ssh_host_key_hint">SHA256:... or MD5:...; leave empty to trust on first use</string>
+    <string name="server_lab_ssh_insecure_hint">Skip server host key verification</string>
+
+    <string name="menu_item_import_config_test">Import test config</string>
+
+    <string name="stratos_engine_not_bundled">The %1$s tunnel engine is not bundled in this build yet.</string>
+
+    <string name="stratos_settings_profiles">Profiles &amp; test config</string>
+    <string name="stratos_settings_profiles_desc">Manage servers, import configs and open advanced mode</string>
+
 </resources>

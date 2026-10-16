@@ -569,4 +569,31 @@
     <string name="stratos_expanded">واز بیڌه</string>
     <string name="stratos_collapsed">بسته بیڌه</string>
     <string name="stratos_powered_by">ساخته بیڌه وا v2rayNG • GPLv3</string>
+    <string name="menu_item_import_config_manually_dnstt">ٱووردن [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">ٱووردن [Lightway]</string>
+    <string name="menu_item_import_config_manually_ssh">ٱووردن [SSH]</string>
+    <string name="server_lab_dnstt_pubkey">کلی ٱومونی سرور</string>
+    <string name="server_lab_dnstt_pubkey_hint">۶۴ نویسهٔ هگز (وتیجۀ dnstt-server -gen-key)</string>
+    <string name="server_lab_dnstt_resolver">ریزالور DNS</string>
+    <string name="server_lab_dnstt_resolver_hint">udp:1.1.1.1، tls:1.1.1.1[:853] یا نشوانی DoH</string>
+    <string name="server_lab_tunnel_mtu">MTU (اختیاری، پیش‌فار ۱۲۸۰)</string>
+    <string name="server_lab_lightway_proto">انتقال</string>
+    <string name="server_lab_lightway_cipher">رزم‌نگاری</string>
+    <string name="server_lab_lightway_obfs">رزم مبهّم‌سازی (اختیاری)</string>
+    <string name="server_lab_ssh_auth">احراز هویت</string>
+    <string name="server_lab_ssh_username">نام کاربری</string>
+    <string name="server_lab_ssh_password">رزم</string>
+    <string name="server_lab_ssh_private_key">کلی خوصوصی (PEM)</string>
+    <string name="server_lab_ssh_private_key_hint">کلی خوصوصی PEM سبک OpenSSH یا PKCS#8</string>
+    <string name="server_lab_ssh_host_key">اثر انگشت کلی میزبان (اختیاری)</string>
+    <string name="server_lab_ssh_host_key_hint">SHA256:... یا MD5:...؛ واسهٔ اعتماد سر اۊرین وصل خالی بزارید</string>
+    <string name="server_lab_ssh_insecure_hint">رد کردن بررسی کلی میزبان سرور</string>
+
+    <string name="menu_item_import_config_test">ٱووردن کانفیگ تِستی</string>
+
+    <string name="stratos_engine_not_bundled">موتور تونل %1$s هنو تو این نسیه نۊریتے نومه.</string>
+
+    <string name="stratos_settings_profiles">پروفایلا ٱ کانفیگ تِستی</string>
+    <string name="stratos_settings_profiles_desc">مدیریت سرورا، ٱووردن کانفیگ ٱ حالت پیش‌رفته</string>
+
 </resources>

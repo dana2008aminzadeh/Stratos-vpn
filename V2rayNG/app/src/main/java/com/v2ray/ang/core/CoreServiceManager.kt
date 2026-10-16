@@ -12,6 +12,7 @@ import android.os.ParcelFileDescriptor
 import android.system.OsConstants
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.contracts.IDialerService
 import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.dto.ConnectionTestResult
@@ -25,6 +26,7 @@ import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SpeedtestManager
 import com.v2ray.ang.helper.MessageHelper
+import com.v2ray.ang.stratos.engine.StratosEngineManager
 import com.v2ray.ang.service.DialerNativeService
 import com.v2ray.ang.service.DialerWebviewService
 import com.v2ray.ang.service.NetworkMonitor
@@ -137,6 +139,29 @@ object CoreServiceManager {
             error(result.errorMessage.ifBlank { "Failed to get V2Ray config" })
         }
 
+        // Local data-plane engines (SSH, …) must be up before the core starts
+        // dialing its loopback outbound. On a network handover the old engine
+        // session is dead, so restart it in place.
+        if (StratosEngineManager.usesLocalEngine(config.configType)) {
+            if (isReload) {
+                StratosEngineManager.stopEngine()
+            }
+            val protector: (java.net.Socket) -> Boolean = { socket ->
+                val svc = serviceControl?.get()?.getService()
+                if (svc is android.net.VpnService) svc.protect(socket) else true
+            }
+            when (val engineResult = StratosEngineManager.ensureEngine(config, protector)) {
+                is StratosEngineManager.StartResult.Running -> {}
+                is StratosEngineManager.StartResult.Failed ->
+                    error(engineResult.reason.ifBlank { "Tunnel engine failed to start" })
+
+                is StratosEngineManager.StartResult.EngineMissing ->
+                    error(service.getString(R.string.stratos_engine_not_bundled, engineResult.protocolLabel))
+            }
+        } else {
+            StratosEngineManager.stopEngine()
+        }
+
         currentConfig = config
         var tunFd = vpnInterface?.fd ?: 0
         val dialerMode = BrowserDialerMode.from(config.browserDialerMode)
@@ -193,6 +218,7 @@ object CoreServiceManager {
         connectionTestScope.coroutineContext.cancelChildren()
         val service = getService() ?: return false
 
+        StratosEngineManager.stopEngine()
         networkMonitor?.unregister()
         networkMonitor = null
         currentVpnInterface = null

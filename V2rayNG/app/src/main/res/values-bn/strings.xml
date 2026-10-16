@@ -569,4 +569,31 @@
     <string name="stratos_expanded">প্রসারিত</string>
     <string name="stratos_collapsed">সংকুচিত</string>
     <string name="stratos_powered_by">v2rayNG দ্বারা চালিত • GPLv3</string>
+    <string name="menu_item_import_config_manually_dnstt">যোগ করুন [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">যোগ করুন [Lightway]</string>
+    <string name="menu_item_import_config_manually_ssh">যোগ করুন [SSH]</string>
+    <string name="server_lab_dnstt_pubkey">সার্ভারের পাবলিক কী</string>
+    <string name="server_lab_dnstt_pubkey_hint">৬৪টি হেক্স অক্ষর (dnstt-server -gen-key এর আউটপুট)</string>
+    <string name="server_lab_dnstt_resolver">DNS রিজলভার</string>
+    <string name="server_lab_dnstt_resolver_hint">udp:1.1.1.1, tls:1.1.1.1[:853] অথবা DoH URL</string>
+    <string name="server_lab_tunnel_mtu">MTU (ঐচ্ছিক, ডিফল্ট 1280)</string>
+    <string name="server_lab_lightway_proto">ট্রান্সপোর্ট</string>
+    <string name="server_lab_lightway_cipher">সাইফার</string>
+    <string name="server_lab_lightway_obfs">অস্পষ্টকরণ পাসওয়ার্ড (ঐচ্ছিক)</string>
+    <string name="server_lab_ssh_auth">প্রমাণীকরণ</string>
+    <string name="server_lab_ssh_username">ব্যবহারকারীর নাম</string>
+    <string name="server_lab_ssh_password">পাসওয়ার্ড</string>
+    <string name="server_lab_ssh_private_key">প্রাইভেট কী (PEM)</string>
+    <string name="server_lab_ssh_private_key_hint">OpenSSH অথবা PKCS#8 PEM প্রাইভেট কী</string>
+    <string name="server_lab_ssh_host_key">হোস্ট কী ফিঙ্গারপ্রিন্ট (ঐচ্ছিক)</string>
+    <string name="server_lab_ssh_host_key_hint">SHA256:... অথবা MD5:...; প্রথম ব্যবহারে বিশ্বাস করতে খালি রাখুন</string>
+    <string name="server_lab_ssh_insecure_hint">সার্ভার হোস্ট কী যাচাই বাদ দিন</string>
+
+    <string name="menu_item_import_config_test">পরীক্ষামূলক কনফিগ আমদানি করুন</string>
+
+    <string name="stratos_engine_not_bundled">%1$s টানেল ইঞ্জিন এই বিল্ডে এখনো অন্তর্ভুক্ত হয়নি।</string>
+
+    <string name="stratos_settings_profiles">প্রোফাইল ও পরীক্ষামূলক কনফিগ</string>
+    <string name="stratos_settings_profiles_desc">সার্ভার পরিচালনা, কনফিগ আমদানি ও উন্নত মোড খুলুন</string>
+
 </resources>
