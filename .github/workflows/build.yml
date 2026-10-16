@@ -129,7 +129,13 @@ jobs:
           echo "::error title=dnstt build armeabi-v7a::${out}"
           exit 1
         fi
-        if ! out=$(GOOS=android GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/x86_64/libdnsttclient.so ./dnstt-client 2>&1); then
+        # android/amd64 also requires external (cgo) linking — same NDK driver as above
+        NDK_CLANG_X64="${NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang"
+        if [ ! -x "$NDK_CLANG_X64" ]; then
+          echo "::error title=dnstt build x86_64::NDK clang not found at $NDK_CLANG_X64"
+          exit 1
+        fi
+        if ! out=$(GOOS=android GOARCH=amd64 CGO_ENABLED=1 CC="$NDK_CLANG_X64" go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/x86_64/libdnsttclient.so ./dnstt-client 2>&1); then
           echo "::error title=dnstt build x86_64::${out}"
           exit 1
         fi
