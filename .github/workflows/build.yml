@@ -117,7 +117,15 @@ jobs:
           echo "::error title=dnstt build arm64-v8a::${out}"
           exit 1
         fi
-        if ! out=$(GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/armeabi-v7a/libdnsttclient.so ./dnstt-client 2>&1); then
+        # android/arm requires external (cgo) linking for the PIE the platform
+        # mandates, so the 32-bit build goes through the NDK clang driver (already
+        # installed for the app build) instead of the pure-Go linker.
+        NDK_CLANG="${NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang"
+        if [ ! -x "$NDK_CLANG" ]; then
+          echo "::error title=dnstt build armeabi-v7a::NDK clang not found at $NDK_CLANG"
+          exit 1
+        fi
+        if ! out=$(GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=1 CC="$NDK_CLANG" go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/armeabi-v7a/libdnsttclient.so ./dnstt-client 2>&1); then
           echo "::error title=dnstt build armeabi-v7a::${out}"
           exit 1
         fi
