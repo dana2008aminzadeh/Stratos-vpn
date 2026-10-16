@@ -1,53 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Stratos VPN brand mark: planet + orbit ring (stratosphere). -->
+<!-- Stratos VPN launcher foreground: aurora planet + metallic orbit ring. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- orbit ring (behind planet) -->
-    <group
-        android:rotation="-20"
-        android:pivotX="54"
-        android:pivotY="54">
+
+    <!-- stars -->
+    <path android:pathData="M18.5,24.5m-1.1,0a1.1,1.1 0 1,1 2.2,0a1.1,1.1 0 1,1 -2.2,0" android:fillColor="#C8DCFF" />
+    <path android:pathData="M88.2,21.4m-0.85,0a0.85,0.85 0 1,1 1.7,0a0.85,0.85 0 1,1 -1.7,0" android:fillColor="#AFC6F5" />
+    <path android:pathData="M92.6,78.2m-0.95,0a0.95,0.95 0 1,1 1.9,0a0.95,0.95 0 1,1 -1.9,0" android:fillColor="#AFC6F5" />
+    <path android:pathData="M14.8,71.7m-0.75,0a0.75,0.75 0 1,1 1.5,0a0.75,0.75 0 1,1 -1.5,0" android:fillColor="#C8DCFF" />
+
+    <!-- planet atmosphere -->
+    <path android:pathData="M54,54m-21,0a21,21 0 1,1 42,0a21,21 0 1,1 -42,0"
+        android:fillColor="#2E9EEB" android:fillAlpha="0.16" />
+
+    <!-- metallic orbit ring (back half) -->
+    <group android:rotation="-18" android:pivotX="54" android:pivotY="54">
         <path
-            android:pathData="M86,54 A32,12.5 0 1 1 22,54 A32,12.5 0 1 1 86,54"
-            android:strokeColor="#22D3EE"
-            android:strokeWidth="2.4"
-            android:strokeLineCap="round"  android:fillColor="#00000000" />
+            android:pathData="M88,54 A34,13 0 1 1 20,54 A34,13 0 1 1 88,54"
+            android:strokeColor="#EAF5FF"
+            android:strokeWidth="3.8"
+            android:strokeLineCap="round" android:fillColor="#00000000" />
     </group>
+
     <!-- planet -->
-    <path android:pathData="M54,37a17,17 0 1,1 -0.02,0">
+    <path android:pathData="M54,35.4a18.6,18.6 0 1,1 -0.02,0">
         <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="40"
-                android:startY="40"
-                android:endX="69"
-                android:endY="69">
-                <item android:offset="0" android:color="#FF38BDF8" />
-                <item android:offset="1" android:color="#FF6366F1" />
+            <gradient android:type="linear" android:startX="38.5" android:startY="38.5" android:endX="71.5" android:endY="71.5">
+                <item android:offset="0" android:color="#FF8BEFFF" />
+                <item android:offset="0.45" android:color="#FF2E9EEB" />
+                <item android:offset="1" android:color="#FF5846DC" />
             </gradient>
         </aapt:attr>
     </path>
-    <!-- orbit ring (front half) -->
-    <group
-        android:rotation="-20"
-        android:pivotX="54"
-        android:pivotY="54">
+
+    <!-- planet gloss -->
+    <path android:pathData="M46.2,42.4m-6.3,0a6.3,4.7 0 1,1 12.6,0a6.3,4.7 0 1,1 -12.6,0"
+        android:fillColor="#FFFFFF" android:fillAlpha="0.22" />
+
+    <!-- metallic orbit ring (front half) -->
+    <group android:rotation="-18" android:pivotX="54" android:pivotY="54">
         <path
-            android:pathData="M86,54 A32,12.5 0 0 1 22,54"
-            android:strokeColor="#38BDF8"
-            android:strokeWidth="2.6"
-            android:strokeLineCap="round"  android:fillColor="#00000000" />
+            android:pathData="M88,54 A34,13 0 0 1 20,54"
+            android:strokeColor="#F4F9FF"
+            android:strokeWidth="4"
+            android:strokeLineCap="round" android:fillColor="#00000000" />
     </group>
-    <!-- satellite -->
-    <path
-        android:pathData="M27.6,68.4m-3.2,0a3.2,3.2 0 1,1 6.4,0a3.2,3.2 0 1,1 -6.4,0"
-        android:fillColor="#F0F4FF" />
-    <!-- stars -->
-    <path android:pathData="M21.6,28.1m-1.1,0a1.1,1.1 0 1,1 2.2,0a1.1,1.1 0 1,1 -2.2,0" android:fillColor="#C8DCFF" />
-    <path android:pathData="M86.4,23.8m-0.9,0a0.9,0.9 0 1,1 1.8,0a0.9,0.9 0 1,1 -1.8,0" android:fillColor="#C8DCFF" />
-    <path android:pathData="M77.8,86.4m-1.0,0a1.0,1.0 0 1,1 2.0,0a1.0,1.0 0 1,1 -2.0,0" android:fillColor="#C8DCFF" />
+
+    <!-- comet on the ring -->
+    <group android:rotation="-18" android:pivotX="54" android:pivotY="54">
+        <path
+            android:pathData="M70.4,40.4 L78.1,43.3"
+            android:strokeColor="#DFF4FF"
+            android:strokeWidth="2.5"
+            android:strokeLineCap="round" android:fillColor="#00000000" android:strokeAlpha="0.75" />
+    </group>
+    <path android:pathData="M81.8,32.8m-2.4,0a2.4,2.4 0 1,1 4.8,0a2.4,2.4 0 1,1 -4.8,0"
+        android:fillColor="#F2FBFF" />
 </vector>
