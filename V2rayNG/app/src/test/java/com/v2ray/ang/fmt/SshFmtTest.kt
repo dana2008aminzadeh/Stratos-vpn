@@ -32,7 +32,7 @@ class SshFmtTest {
         val config = SshFmt.parse(uri)!!
         assertEquals(SshFmt.AUTH_KEY, config.method)
         // decodeURIComponent keeps '+' literal (RFC 3986 strictness)
-        assertEquals("-----+OPENSSH+PRIVATE+KEY-----", config.path)
+        assertEquals("-----BEGIN+OPENSSH+PRIVATE+KEY-----", config.path)
         assertEquals("top", config.password)
         assertEquals("SHA256:abc+def", config.publicKey)
     }

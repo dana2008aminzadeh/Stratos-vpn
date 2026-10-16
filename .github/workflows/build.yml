@@ -190,11 +190,11 @@ jobs:
           echo "::error title=Unit tests::gradlew :app:testPlaystoreDebugUnitTest failed (exit $status)"
           # GitHub caps annotations per step at ten — highest value first:
           # assertion messages, then failing test names, then fatal Gradle errors.
-          printf '%s\n' "$out" | grep -E "(AssertionError|expected:<|Exception:)" | head -n 5 | while IFS= read -r line; do
+          printf '%s\n' "$out" | awk '
+            /FAILED$/ { print; c = 2; next }
+            c > 0 && /^[[:space:]]+(at |java\.|kotlin\.|org\.junit|kotlin\.Kotlin) { print; c-- }
+          ' | head -n 9 | while IFS= read -r line; do
             printf '::error title=Test failure::%s\n' "${line:0:400}"
-          done
-          printf '%s\n' "$out" | grep -E "FAILED$" | head -n 4 | while IFS= read -r line; do
-            printf '::error title=Test failed::%s\n' "${line:0:400}"
           done
           exit 1
         fi
