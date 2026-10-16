@@ -34,7 +34,7 @@ class Socks5ProtocolTest {
         val domain = "example.com"
         val request = byteArrayOf(
             0x05, 0x01, 0x00, 0x03, domain.length.toByte(),
-        ) + domain.toByteArray(Charsets.ISO_8859_1) + byteArrayOf(0x01, 0xBB) // 443
+        ) + domain.toByteArray(Charsets.ISO_8859_1) + byteArrayOf(0x01, 0xBB.toByte()) // 443
         assertEquals(7 + domain.length, Socks5Protocol.requestLength(request.copyOf(5)))
         val target = Socks5Protocol.parseConnectRequest(request)!!
         assertEquals("example.com", target.host)
@@ -46,7 +46,7 @@ class Socks5ProtocolTest {
         val request = byteArrayOf(
             0x05, 0x01, 0x00, 0x01,
             10, 0, 0, 1,
-            0x1F, 0x90, // 8080
+            0x1F, 0x90.toByte(), // 8080
         )
         assertEquals(10, Socks5Protocol.requestLength(request))
         val target = Socks5Protocol.parseConnectRequest(request)!!
@@ -81,7 +81,7 @@ class Socks5ProtocolTest {
     fun `reply message shape`() {
         val reply = Socks5Protocol.buildReply(Socks5Protocol.REPLY_SUCCESS, "1.2.3.4", 443)
         assertArrayEquals(
-            byteArrayOf(0x05, 0x00, 0x00, 0x01, 1, 2, 3, 4, 0x01, 0xBB),
+            byteArrayOf(0x05, 0x00, 0x00, 0x01, 1, 2, 3, 4, 0x01, 0xBB.toByte()),
             reply,
         )
         val fail = Socks5Protocol.buildReply(Socks5Protocol.REPLY_CONNECTION_REFUSED)
