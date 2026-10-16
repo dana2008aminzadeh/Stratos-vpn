@@ -8,8 +8,8 @@ A fully rebranded, account-based VPN client built on top of v2rayNG (GPLv3).
 | Area | Stratos VPN |
 |---|---|
 | Package id | `com.stratos.vpn` — installs side-by-side with the original v2rayNG |
-| Name / icons | Stratos VPN + custom “planet & orbit” brand (adaptive icon, in-app icon set) |
-| Theme | Dark-space Material 3 theme (indigo/sky/cyan), Persian-first with full RTL |
+| Name / icons | Stratos VPN + new **aurora-planet** brand mark (glowing cyan→indigo planet, metallic orbit ring, comet streak): adaptive launcher icons, store icon/feature graphics, in-app logo vectors, all regenerable via `fastlane/tools/gen_stratos_icons.py` |
+| Theme | Space-themed Material 3 redesign: nebula starfield backdrop, spectral glass cards, gradient connect orb with data-remaining ring, Persian-first with full RTL |
 | Entry point | Login first: username `fyx…` (4–8 chars) + password (5–10), or QR login |
 | Backend | Panel API (`docs/STRATOS_API.md`) with built-in **offline demo backend** |
 | Subscription link | Never shown — servers arrive via the API and are imported internally |
@@ -22,6 +22,25 @@ A fully rebranded, account-based VPN client built on top of v2rayNG (GPLv3).
 | Usage accounting | Measured in-app (proxy byte counters), counted against the plan, reported to the panel every ~30 s; expired volume/time ⇒ instant disconnect + reconnect blocked, renewal/refresh UI shown |
 | Sync | Account snapshot every 2 min; fleet + operator config every ~10 min |
 | Expired users | Can ping and update servers, **cannot connect** |
+
+## Protocol engines (data plane)
+
+| Protocol | Profile / editor / import-export | Tunnel engine | Notes |
+|---|---|---|---|
+| VMess, VLESS (+Reality), SS, Trojan, SOCKS, HTTP, WireGuard, Hysteria2 | ✅ | ✅ Xray-core | WireGuard via the Xray `wireguard` outbound |
+| **SSH** | ✅ (`ssh://user[:pass]@host:port?auth=password\|key&key=<b64-PEM>&hostkey=<SHA256>&insecure=…`) | ✅ **built-in Kotlin engine** (`stratos/engine/StratosSshEngine` + JSch) | Local SOCKS5 front-end carrying `direct-tcpip` channels; host-key pinning by SHA-256 fingerprint; upstream sockets protected from the VPN; **TCP only** (use TCP/DoH remote DNS) |
+| **DNSTT** | ✅ (`dnstt://<pubkey>@<domain>?resolver=…&mtu=…`) | ⏳ not bundled yet | Connecting fails with a clear localized message instead of hanging; port plan: Kotlin port of the dnstt client (turbotunnel + Noise_NK + KCP) |
+| **Lightway** | ✅ (`lightway://<password>@host:port?proto,cipher,sni,alpn,insecure,obfs,…`) | ⏳ not bundled yet | Same clear failure path; engine requires the lightway-core (C/wolfSSL) via JNI |
+
+A bundled **test config** (VLESS + REALITY) ships in `assets/stratos_test_config.json` and is
+importable with one tap (Add → “Import test config”) so the connection path can be exercised
+immediately.
+
+## Design
+
+- **Design system** `ui/stratos/StratosUiBits.kt`: aurora palette (cyan `#3BE3FF` → indigo `#6C63FF` → violet `#B14BFF`), nebula starfield backdrop with orbit arcs, spectral glass cards, gradient primary button with glow, pills and dividers. All screens inherit it, so the whole app reads as one product.
+- **Screens** (Compose): login with hero mark + halo, home with gradient **connect orb** (data-remaining ring, orbiting satellite), IP/plan/live panels with sparkline, servers with country tiles + protocol badges + ping badges, DNS presets, settings, about.
+- **Battery**: the backdrop and marks are static (no frame-by-frame animation); the orb pulse/satellite animations exist only while the tunnel is up; the live-speed notification loop stops on screen-off and resumes on screen-on; periodic sync uses WorkManager; ping pre-checks skip engine-backed types.
 
 ## Repository layout
 
