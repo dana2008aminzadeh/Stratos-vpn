@@ -188,14 +188,17 @@ jobs:
           status=$?
           echo "$out" | tail -n 250
           echo "::error title=Unit tests::gradlew :app:testPlaystoreDebugUnitTest failed (exit $status)"
-          printf '%s\n' "$out" | grep -E "(^e: |error: |FAILURE:|What went wrong:|Caused by:|FAILED$)" | head -n 60 | while IFS= read -r line; do
+          # GitHub caps annotations per step at ten — highest value first:
+          # assertion messages, then failing test names, then fatal Gradle errors.
+          printf '%s\n' "$out" | grep -E "(AssertionError|expected:<|Exception:)" | head -n 5 | while IFS= read -r line; do
+            printf '::error title=Test failure::%s\n' "${line:0:400}"
+          done
+          printf '%s\n' "$out" | grep -E "FAILED$" | head -n 3 | while IFS= read -r line; do
+            printf '::error title=Test failed::%s\n' "${line:0:400}"
+          done
+          printf '%s\n' "$out" | grep -E "(^e: |FAILURE:|What went wrong:)" | head -n 1 | while IFS= read -r line; do
             printf '::error title=Gradle::%s\n' "${line:0:400}"
           done
-          if [ -d app/build/test-results ]; then
-            find app/build/test-results -name '*.xml' -exec grep -H -E "<(failure|error)" {} \; | head -n 40 | while IFS= read -r line; do
-              printf '::error title=Test failure::%s\n' "${line:0:400}"
-            done
-          fi
           exit 1
         fi
 

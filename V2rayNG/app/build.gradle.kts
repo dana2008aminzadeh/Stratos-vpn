@@ -211,3 +211,18 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
+
+// Unit test logging: surface assertion messages and stack causes when the suite
+// fails (the CI workflow converts these lines into readable annotations).
+tasks.withType<Test>().configureEach {
+    testLogging {
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        events = setOf(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+        )
+    }
+}

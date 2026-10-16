@@ -10,7 +10,7 @@ class LightwayFmtTest {
     @Test
     fun `parse full uri`() {
         val ca = "-----BEGIN CERTIFICATE-----\\nMIIB\\n-----END CERTIFICATE-----"
-        val uri = "lightway://alice:s3cret@lw.example.com:27690?dn=lw.example.com&mode=tcp&cipher=aes256&ca=${java.net.URLEncoder.encode(ca, "UTF-8")}#LW"
+        val uri = "lightway://alice:s3cret@lw.example.com:27690?dn=lw.example.com&mode=tcp&cipher=aes256&ca=${com.v2ray.ang.util.Utils.encodeURIComponent(ca)}#LW"
         val config = LightwayFmt.parse(uri)!!
         assertEquals(EConfigType.LIGHTWAY, config.configType)
         assertEquals("lw.example.com", config.server)
@@ -48,7 +48,7 @@ class LightwayFmtTest {
     @Test
     fun `round trip preserves the profile`() {
         val original = LightwayFmt.parse("lightway://alice:s3cret@lw.example.com:27690?dn=lw.example.com&mode=udp&cipher=aes128#LW")!!
-        val back = LightwayFmt.parse(LightwayFmt.toUri(original))!!
+        val back = LightwayFmt.parse(EConfigType.LIGHTWAY.protocolScheme + LightwayFmt.toUri(original))!!
         assertEquals(original.server, back.server)
         assertEquals(original.serverPort, back.serverPort)
         assertEquals(original.username, back.username)

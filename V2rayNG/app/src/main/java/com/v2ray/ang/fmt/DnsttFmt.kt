@@ -1,6 +1,5 @@
 package com.v2ray.ang.fmt
 
-import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.idnHost
@@ -106,6 +105,8 @@ object DnsttFmt : FmtBase() {
 
         val query = dicQuery.entries.joinToString("&") { (k, v) -> "$k=${Utils.encodeURIComponent(v)}" }
         val host = Utils.getIpv6Address(HttpUtil.toIdnDomain(config.server.orEmpty()))
-        return "${AppConfig.DNSTT}$host?$query#${Utils.encodeURIComponent(config.remarks)}"
+        // NOTE: the scheme is intentionally NOT included — AngConfigManager.shareConfig
+        // prepends EConfigType.protocolScheme, same as every other format.
+        return "$host?$query#${Utils.encodeURIComponent(config.remarks)}"
     }
 }

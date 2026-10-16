@@ -54,7 +54,7 @@ class SshFmtTest {
     @Test
     fun `round trip preserves the profile`() {
         val original = SshFmt.parse("ssh://alice:s3cret@ssh.example.com:2222#My%20SSH")!!
-        val uri = SshFmt.toUri(original)
+        val uri = EConfigType.SSH.protocolScheme + SshFmt.toUri(original)
         val back = SshFmt.parse(uri)!!
         assertEquals(original.server, back.server)
         assertEquals(original.serverPort, back.serverPort)
@@ -67,7 +67,7 @@ class SshFmtTest {
     @Test
     fun `round trip key auth`() {
         val original = SshFmt.parse("ssh://carol@k.example:22?auth=key&privkey=AAAAB3Nza&passphrase=pp&pin=SHA256%3Axyz#k")!!
-        val back = SshFmt.parse(SshFmt.toUri(original))!!
+        val back = SshFmt.parse(EConfigType.SSH.protocolScheme + SshFmt.toUri(original))!!
         assertEquals(original.path, back.path)
         assertEquals(original.password, back.password)
         assertEquals(original.publicKey, back.publicKey)

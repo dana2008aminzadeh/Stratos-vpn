@@ -50,13 +50,17 @@ object LightwayFmt : FmtBase() {
         config.path = queryParam["ca"]?.takeIf { it.isNotBlank() }
         config.publicKey = queryParam["token"]?.takeIf { it.isNotBlank() }
 
-        if (uri.userInfo?.isEmpty() == false) {
-            val result = if (uri.userInfo.contains(":")) {
-                uri.userInfo.split(":", limit = 2)
+        val userInfo = uri.userInfo
+        if (!userInfo.isNullOrEmpty()) {
+            val result = if (userInfo.contains(":")) {
+                userInfo.split(":", limit = 2)
             } else {
-                Utils.decode(uri.userInfo).split(":", limit = 2)
+                // Either a base64(user:pass) blob (our own toUri output) or a bare
+                // username alongside a token: lightway://carol@host?token=…
+                val decoded = Utils.decode(userInfo)
+                if (decoded.contains(":")) decoded.split(":", limit = 2) else listOf(userInfo, "")
             }
-            if (result.count() == 2) {
+            if (result.count() == 2 && result.first().isNotEmpty()) {
                 config.username = result.first()
                 config.password = result.last()
             }

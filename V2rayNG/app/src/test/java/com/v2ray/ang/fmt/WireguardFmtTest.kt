@@ -24,7 +24,7 @@ class WireguardFmtTest {
     @Test
     fun `round trip wireguard uri`() {
         val original = WireguardFmt.parse("wireguard://c2VjcmV0@1.2.3.4:51820?publickey=dXBsa2V5&address=172.16.0.2%2F32#WG")!!
-        val back = WireguardFmt.parse(WireguardFmt.toUri(original))!!
+        val back = WireguardFmt.parse(EConfigType.WIREGUARD.protocolScheme + WireguardFmt.toUri(original))!!
         assertEquals(original.server, back.server)
         assertEquals(original.serverPort, back.serverPort)
         assertEquals(original.secretKey, back.secretKey)

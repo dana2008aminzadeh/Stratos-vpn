@@ -56,7 +56,7 @@ class DnsttFmtTest {
     @Test
     fun `round trip udp`() {
         val original = DnsttFmt.parse("dnstt://tunnel.example.com?pubkey=$hexKey&transport=udp&resolver=8.8.8.8%3A5353#T")!!
-        val back = DnsttFmt.parse(DnsttFmt.toUri(original))!!
+        val back = DnsttFmt.parse(EConfigType.DNSTT.protocolScheme + DnsttFmt.toUri(original))!!
         assertEquals(original.server, back.server)
         assertEquals(original.publicKey, back.publicKey)
         assertEquals(original.method, back.method)
@@ -68,7 +68,7 @@ class DnsttFmtTest {
     @Test
     fun `round trip doh`() {
         val original = DnsttFmt.parse("dnstt://tunnel.example.com?pubkey=$hexKey&transport=doh&dns=https%3A%2F%2Fdns.adguard-dns.com%2Fdns-query")!!
-        val back = DnsttFmt.parse(DnsttFmt.toUri(original))!!
+        val back = DnsttFmt.parse(EConfigType.DNSTT.protocolScheme + DnsttFmt.toUri(original))!!
         assertEquals(original.path, back.path)
         assertEquals(DnsttFmt.TRANSPORT_DOH, back.method)
     }
