@@ -118,11 +118,22 @@ jobs:
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
+        set -o pipefail
         ./gradlew assembleRelease \
           -Pandroid.injected.signing.store.file=${{ github.workspace }}/android_keystore.jks \
           -Pandroid.injected.signing.store.password=${{ env.KS_STORE_PASSWORD }} \
           -Pandroid.injected.signing.key.alias=${{ env.KS_ALIAS }} \
-          -Pandroid.injected.signing.key.password=${{ env.KS_KEY_PASSWORD }}
+          -Pandroid.injected.signing.key.password=${{ env.KS_KEY_PASSWORD }} 2>&1 | tee /tmp/gradle-build.log
+        status=$?
+        if [ $status -ne 0 ]; then
+          echo "Build failed with exit code $status; surfacing errors as annotations"
+          grep -E "^e: |error:|FAILURE:|What went wrong|Execution failed|> Task .*FAILED|Could not|Unresolved" /tmp/gradle-build.log \
+            | head -n 30 | while IFS= read -r line; do
+              short=$(printf '%.400s' "$line")
+              echo "::error::${short}"
+            done
+          exit $status
+        fi
 
     - name: Upload arm64-v8a APK
       uses: actions/upload-artifact@v7
