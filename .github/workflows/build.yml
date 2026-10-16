@@ -191,8 +191,11 @@ jobs:
           # GitHub caps annotations per step at ten — highest value first:
           # assertion messages, then failing test names, then fatal Gradle errors.
           printf '%s\n' "$out" | awk '
-            /FAILED$/ { print; c = 2; next }
-            c > 0 && /^[[:space:]]+(at |java\.|kotlin\.|org\.junit|kotlin\.Kotlin) { print; c-- }
+            /^e: / { print; if (++n >= 9) exit; next }
+            /FAILED$/ { print; c = 2; if (++n >= 9) exit; next }
+            c > 0 && /^[[:space:]]+(at |java\.|kotlin\.|org\.junit)/ { print; c--; n++; next }
+            /^FAILURE:/ { if (++n >= 9) exit; print; next }
+            /\* What went wrong:/ { if (++n >= 9) exit; print; next }
           ' | head -n 9 | while IFS= read -r line; do
             printf '::error title=Test failure::%s\n' "${line:0:400}"
           done
