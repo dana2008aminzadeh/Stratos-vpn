@@ -585,4 +585,7 @@
 
     <string name="stratos_engine_not_bundled">موتور تونل %1$s هنوز در این نسخه قرار نگرفته است.</string>
 
+    <string name="stratos_settings_profiles">پروفایل‌ها و کانفیگ تستی</string>
+    <string name="stratos_settings_profiles_desc">مدیریت سرورها، افزودن کانفیگ و حالت پیشرفته</string>
+
 </resources>

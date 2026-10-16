@@ -58,6 +58,7 @@ import com.v2ray.ang.stratos.StratosAdminConfig
 import com.v2ray.ang.stratos.StratosSession
 import com.v2ray.ang.stratos.StratosSettingsController
 import com.v2ray.ang.ui.base.HelperBaseComponentActivity
+import com.v2ray.ang.ui.main.MainActivity
 import com.v2ray.ang.ui.settings.SettingsActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -149,6 +150,7 @@ class StratosSettingsActivity : HelperBaseComponentActivity() {
             onApplyBest = viewModel::applyBestSettings,
             onLanguage = viewModel::setLanguage,
             onAdvanced = { startActivity(Intent(this, SettingsActivity::class.java)) },
+            onProfiles = { startActivity(Intent(this, MainActivity::class.java)) },
         )
     }
 }
@@ -165,6 +167,7 @@ private fun StratosSettingsScreen(
     onApplyBest: () -> Unit,
     onLanguage: (String) -> Unit,
     onAdvanced: () -> Unit,
+    onProfiles: () -> Unit,
 ) {
     val state by uiState.collectAsStateWithLifecycle()
 
@@ -349,6 +352,51 @@ private fun StratosSettingsScreen(
                             )
                         }
                     }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    StratosGlassCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .clickable(role = Role.Button, onClick = onProfiles)
+                            .semantics(mergeDescendants = true) {
+                                role = Role.Button
+                            },
+                        shape = RoundedCornerShape(24.dp),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(17.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Surface(
+                                color = StratosColors.Cyan.copy(alpha = 0.12f),
+                                shape = RoundedCornerShape(13.dp),
+                                modifier = Modifier.size(43.dp),
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        painterResource(R.drawable.ic_stratos_list_24),
+                                        contentDescription = null,
+                                        tint = StratosColors.Cyan,
+                                        modifier = Modifier.size(22.dp),
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.stratos_settings_profiles),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    stringResource(R.string.stratos_settings_profiles_desc),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
                     }
                     Spacer(Modifier.height(20.dp))
                 }

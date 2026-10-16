@@ -601,4 +601,7 @@
 
     <string name="stratos_engine_not_bundled">محرك النفق %1$s غير مضمّن في هذا الإصدار بعد.</string>
 
+    <string name="stratos_settings_profiles">الملفات الشخصية وإعدادات الاختبار</string>
+    <string name="stratos_settings_profiles_desc">إدارة الخوادم واستيراد الإعدادات وفتح الوضع المتقدم</string>
+
 </resources>

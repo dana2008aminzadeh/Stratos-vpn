@@ -585,4 +585,7 @@
 
     <string name="stratos_engine_not_bundled">The %1$s tunnel engine is not bundled in this build yet.</string>
 
+    <string name="stratos_settings_profiles">Profiles &amp; test config</string>
+    <string name="stratos_settings_profiles_desc">Manage servers, import configs and open advanced mode</string>
+
 </resources>

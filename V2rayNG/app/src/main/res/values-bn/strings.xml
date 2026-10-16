@@ -593,4 +593,7 @@
 
     <string name="stratos_engine_not_bundled">%1$s টানেল ইঞ্জিন এই বিল্ডে এখনো অন্তর্ভুক্ত হয়নি।</string>
 
+    <string name="stratos_settings_profiles">প্রোফাইল ও পরীক্ষামূলক কনফিগ</string>
+    <string name="stratos_settings_profiles_desc">সার্ভার পরিচালনা, কনফিগ আমদানি ও উন্নত মোড খুলুন</string>
+
 </resources>

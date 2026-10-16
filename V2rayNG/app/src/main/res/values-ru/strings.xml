@@ -597,4 +597,7 @@
 
     <string name="stratos_engine_not_bundled">Туннельный движок %1$s ещё не включён в эту сборку.</string>
 
+    <string name="stratos_settings_profiles">Профили и тестовый конфиг</string>
+    <string name="stratos_settings_profiles_desc">Управление серверами, импорт конфигов и расширенный режим</string>
+
 </resources>

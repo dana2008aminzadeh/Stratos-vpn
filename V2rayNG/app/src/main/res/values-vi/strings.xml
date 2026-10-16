@@ -591,4 +591,7 @@
 
     <string name="stratos_engine_not_bundled">Công cụ đường hầm %1$s chưa được kèm trong bản dựng này.</string>
 
+    <string name="stratos_settings_profiles">Hồ sơ &amp; cấu hình thử nghiệm</string>
+    <string name="stratos_settings_profiles_desc">Quản lý máy chủ, nhập cấu hình và mở chế độ nâng cao</string>
+
 </resources>

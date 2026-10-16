@@ -591,4 +591,7 @@
 
     <string name="stratos_engine_not_bundled">%1$s 隧道引擎尚未包含在此版本中。</string>
 
+    <string name="stratos_settings_profiles">配置文件与测试配置</string>
+    <string name="stratos_settings_profiles_desc">管理服务器、导入配置并打开高级模式</string>
+
 </resources>

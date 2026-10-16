@@ -593,4 +593,7 @@
 
     <string name="stratos_engine_not_bundled">موتور تونل %1$s هنو تو این نسیه نۊریتے نومه.</string>
 
+    <string name="stratos_settings_profiles">پروفایلا ٱ کانفیگ تِستی</string>
+    <string name="stratos_settings_profiles_desc">مدیریت سرورا، ٱووردن کانفیگ ٱ حالت پیش‌رفته</string>
+
 </resources>
