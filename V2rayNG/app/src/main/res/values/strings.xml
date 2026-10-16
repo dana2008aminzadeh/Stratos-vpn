@@ -45,6 +45,21 @@
     <string name="menu_item_import_config_manually_trojan">Add [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Add [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">Add [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_ssh">Add [SSH]</string>
+    <string name="menu_item_import_config_manually_dnstt">Add [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">Add [Lightway]</string>
+    <string name="server_lab_ssh_auth">Authentication</string>
+    <string name="server_lab_private_key">Private key</string>
+    <string name="server_lab_passphrase">Passphrase</string>
+    <string name="server_lab_host_key_pin">Host key fingerprint (optional)</string>
+    <string name="server_lab_dnstt_pubkey">dnstt server public key</string>
+    <string name="server_lab_dnstt_transport">Transport</string>
+    <string name="server_lab_dnstt_resolver">DNS resolver</string>
+    <string name="server_lab_dnstt_dns">DoH/DoT server</string>
+    <string name="server_lab_cipher">Cipher</string>
+    <string name="server_lab_server_dn">Server domain name</string>
+    <string name="server_lab_ca_cert">CA certificate</string>
+    <string name="server_lab_lightway_mode">Mode</string>
     <string name="confirm_delete_visible_profiles">Are you sure you want to delete all profiles currently shown?</string>
     <string name="confirm_delete_duplicate_profiles">Are you sure you want to delete all duplicate profiles currently shown?</string>
     <string name="confirm_delete_invalid_profiles">Please test the profiles first. Are you sure you want to delete all invalid profiles currently shown?</string>
@@ -561,4 +576,7 @@
     <string name="connection_test_empty_message">no details available</string>
     <string name="value_unknown">unknown</string>
 
+    <string name="stratos_relay_failed">The connection relay failed to start</string>
+    <string name="stratos_lightway_failed">Lightway connection failed</string>
+    <string name="stratos_lightway_vpn_only">Lightway profiles connect in VPN mode only</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.v2ray.ang.stratos
 
 import android.content.Context
+import android.os.PowerManager
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.core.LauncherManager
 import com.v2ray.ang.helper.MessageHelper
@@ -18,7 +19,8 @@ import kotlinx.coroutines.launch
 
 /**
  * Keeps the app in sync with the operator panel while the app is alive:
- * - account snapshot every 2 minutes (data, expiry, status),
+ * - account snapshot every 2 minutes while the screen is on (5 minutes in the
+ *   background — see [nextDelayMs]),
  * - device heartbeat (session moved elsewhere => local sign-out),
  * - server fleet + operator config refresh every 10 minutes,
  * - enforcement: expired / out-of-data accounts are disconnected immediately.
@@ -26,7 +28,18 @@ import kotlinx.coroutines.launch
 object StratosSync {
 
     private const val USER_SYNC_INTERVAL_MS = 2 * 60 * 1000L
+    private const val USER_SYNC_INTERVAL_IDLE_MS = 5 * 60 * 1000L
     private const val FLEET_SYNC_EVERY = 5 // every 5th user sync => ~10 min
+
+    /**
+     * Battery-aware cadence: panel traffic is what actually wakes the radio, so the
+     * loop only runs at full rate while the user can observe it. Quota and expiry are
+     * still enforced locally between syncs (the local usage engine gates every
+     * connection sample), and the fleet refresh follows automatically on the next
+     * round — worst case a background change lands up to [USER_SYNC_INTERVAL_IDLE_MS] late.
+     */
+    fun nextDelayMs(interactive: Boolean): Long =
+        if (interactive) USER_SYNC_INTERVAL_MS else USER_SYNC_INTERVAL_IDLE_MS
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var job: Job? = null
@@ -48,10 +61,20 @@ object StratosSync {
                     runCatching { syncNow(appContext) }
                         .onFailure { LogUtil.e(AppConfig.TAG, "Stratos sync failed", it) }
                 }
-                delay(USER_SYNC_INTERVAL_MS)
+                delay(nextDelayMs(isInteractive(appContext)))
             }
         }
         LogUtil.i(AppConfig.TAG, "Stratos sync started")
+    }
+
+    /** True when the device screen is on (or the device is considered interactive). */
+    private fun isInteractive(context: Context): Boolean {
+        return try {
+            val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+            pm?.isInteractive ?: true
+        } catch (e: Exception) {
+            true
+        }
     }
 
     @Synchronized

@@ -27,7 +27,20 @@ object LogUtil {
 
     @Suppress("unused")
     fun refreshLogLevel() {
-        cachedMinPriority = parsePriority(MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL, DEFAULT_LEVEL))
+        cachedMinPriority = parsePriority(readLogLevel())
+    }
+
+    /**
+     * Reads the configured log level. MMKV is not guaranteed to be initialized yet
+     * (very early startup, JVM unit tests), so a storage failure falls back to the
+     * default level instead of exploding inside the caller's logging call.
+     */
+    private fun readLogLevel(): String? {
+        return try {
+            MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL, DEFAULT_LEVEL)
+        } catch (e: Exception) {
+            DEFAULT_LEVEL
+        }
     }
 
     private fun minPriority(): Int {
@@ -41,7 +54,7 @@ object LogUtil {
             if (current != CACHE_UNSET) {
                 current
             } else {
-                parsePriority(MmkvManager.decodeSettingsString(AppConfig.PREF_LOGLEVEL, DEFAULT_LEVEL)).also {
+                parsePriority(readLogLevel()).also {
                     cachedMinPriority = it
                 }
             }
@@ -55,13 +68,18 @@ object LogUtil {
     private fun log(priority: Int, tag: String, message: String, throwable: Throwable? = null) {
         if (!isEnabled(priority)) return
 
-        when {
-            throwable == null -> Log.println(priority, tag, message)
-            priority >= Log.ERROR -> Log.e(tag, message, throwable)
-            priority == Log.WARN -> Log.w(tag, message, throwable)
-            priority == Log.INFO -> Log.i(tag, message, throwable)
-            priority == Log.DEBUG -> Log.d(tag, message, throwable)
-            else -> Log.v(tag, message, throwable)
+        try {
+            when {
+                throwable == null -> Log.println(priority, tag, message)
+                priority >= Log.ERROR -> Log.e(tag, message, throwable)
+                priority == Log.WARN -> Log.w(tag, message, throwable)
+                priority == Log.INFO -> Log.i(tag, message, throwable)
+                priority == Log.DEBUG -> Log.d(tag, message, throwable)
+                else -> Log.v(tag, message, throwable)
+            }
+        } catch (e: Exception) {
+            // android.util.Log is only a stub in JVM unit tests — never break the
+            // caller over a logging call.
         }
     }
 

@@ -45,6 +45,21 @@
     <string name="menu_item_import_config_manually_trojan">[Trojan] যোগ করুন</string>
     <string name="menu_item_import_config_manually_wireguard">[WireGuard] যোগ করুন</string>
     <string name="menu_item_import_config_manually_hysteria2">[Hysteria2] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_ssh">[SSH] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_dnstt">[DNSTT] যোগ করুন</string>
+    <string name="menu_item_import_config_manually_lightway">[Lightway] যোগ করুন</string>
+    <string name="server_lab_ssh_auth">প্রমাণীকরণ</string>
+    <string name="server_lab_private_key">ব্যক্তিগত কী</string>
+    <string name="server_lab_passphrase">পাসফ্রেজ</string>
+    <string name="server_lab_host_key_pin">হোস্ট কী ফিঙারপ্রিন্ট (ঐচ্ছিক)</string>
+    <string name="server_lab_dnstt_pubkey">dnstt সার্ভারের পাবলিক কী</string>
+    <string name="server_lab_dnstt_transport">পরিবহন</string>
+    <string name="server_lab_dnstt_resolver">DNS রিজলভার</string>
+    <string name="server_lab_dnstt_dns">DoH/DoT সার্ভার</string>
+    <string name="server_lab_cipher">সিফার</string>
+    <string name="server_lab_server_dn">সার্ভার ডোমেইন</string>
+    <string name="server_lab_ca_cert">CA সার্টিফিকেট</string>
+    <string name="server_lab_lightway_mode">মোড</string>
     <string name="confirm_delete_visible_profiles">আপনি কি বর্তমানে প্রদর্শিত সব প্রোফাইল মুছে ফেলতে চান?</string>
     <string name="confirm_delete_duplicate_profiles">আপনি কি বর্তমানে প্রদর্শিত সব সদৃশ প্রোফাইল মুছে ফেলতে চান?</string>
     <string name="confirm_delete_invalid_profiles">প্রথমে প্রোফাইলগুলো পরীক্ষা করুন। আপনি কি বর্তমানে প্রদর্শিত সব অবৈধ প্রোফাইল মুছে ফেলতে চান?</string>
@@ -564,6 +579,9 @@
 
     <!-- Stratos premium UI -->
     <string name="stratos_show_password">পাসওয়ার্ড দেখান</string>
+    <string name="stratos_relay_failed">সংযোগ রিলে চালু করতে ব্যর্থ</string>
+    <string name="stratos_lightway_failed">Lightway সংযোগ ব্যর্থ হয়েছে</string>
+    <string name="stratos_lightway_vpn_only">Lightway প্রোফাইল শুধু ভিপিএন মোডে সংযুক্ত হয়</string>
     <string name="stratos_hide_password">পাসওয়ার্ড লুকান</string>
     <string name="stratos_server_count">%1$dটি সার্ভার</string>
     <string name="stratos_expanded">প্রসারিত</string>

@@ -19,9 +19,23 @@ A fully rebranded, account-based VPN client built on top of v2rayNG (GPLv3).
 | DNS | User-selectable presets: default / ad-blocking / family-safe / gaming |
 | Notification | Mandatory foreground notification with live up/down speeds + stop action |
 | Settings | Full engine settings (LAN, IPv6, …) + **operator-forced settings** on sync + one-tap “apply optimal settings” |
-| Usage accounting | Measured in-app (proxy byte counters), counted against the plan, reported to the panel every ~30 s; expired volume/time ⇒ instant disconnect + reconnect blocked, renewal/refresh UI shown |
-| Sync | Account snapshot every 2 min; fleet + operator config every ~10 min |
+| Usage accounting | Measured in-app (proxy byte counters), counted against the plan, reported to the panel every ~30 s; expired volume/time ⇒ instant disconnect + reconnect blocked, renewal/refresh UI shown; the accounting loop keeps running (on a slow screen-off cadence) so background traffic always counts |
+| Protocols | VMess, VLESS, Trojan, Shadowsocks, SOCKS, HTTP, Hysteria2, **WireGuard** (Xray core) plus **SSH** and **DNSTT** (app-managed loopback relays chained into the core) and **Lightway** (dedicated in-process engine that drives the VPN TUN directly; VPN mode only) |
+| Sync | Account snapshot every 2 min while the screen is on (5 min in the background); fleet + operator config every ~5th sync |
 | Expired users | Can ping and update servers, **cannot connect** |
+
+## Extra protocols
+
+| Protocol | How it runs |
+|---|---|
+| WireGuard | Native Xray outbound — import/share/edit as usual (`wireguard://`) |
+| SSH | The app keeps one SSH session (vendored JSch, password or key auth, optional `SHA256:` host-key pin) and exposes a loopback SOCKS5 relay on `127.0.0.1:10861`; the core chains to it (`ssh://`) |
+| DNSTT | CI builds the official `dnstt-client` for every ABI (shipped as `libdnsttclient.so`); the app runs it against the tunnel domain and the core chains to its loopback listener on `127.0.0.1:10862`. Transports: `udp`, `doh`, `dot` (`dnstt://`) |
+| Lightway | The official Lightway library (nightly AAR, CI-fetched) replaces the core for that profile: the engine receives the VPN TUN file descriptor, its outside sockets egress via the app-uid tunnel exclusion, and usage is sampled from per-uid counters (`lightway://`) |
+
+Relay egress is pinned to `direct` in the generated routing config so root mode never
+loops sidecar traffic back through the core. A relay failure stops the session and
+surfaces a localized error instead of leaving a silently dead tunnel.
 
 ## Repository layout
 

@@ -32,6 +32,11 @@ object CoreOutboundBuilder {
             EConfigType.WIREGUARD -> toOutboundWireguard(profileItem)
             EConfigType.HYSTERIA2 -> toOutboundHysteria2(profileItem)
             EConfigType.HTTP -> toOutboundHttp(profileItem)
+            // SSH and DNSTT are relay-chained protocols: the app runs a local relay and the
+            // core dials it over socks on loopback. Lightway never reaches Xray — it runs in
+            // its dedicated engine inside the VPN service, so no outbound is produced here.
+            EConfigType.SSH -> toOutboundLocalRelay(profileItem, AppConfig.PORT_SSH_RELAY)
+            EConfigType.DNSTT -> toOutboundLocalRelay(profileItem, AppConfig.PORT_DNSTT_RELAY)
             else -> null
         }
 
@@ -104,6 +109,14 @@ object CoreOutboundBuilder {
             EConfigType.HYSTERIA,
             EConfigType.HYSTERIA2 -> OutboundBean(
                 protocol = EConfigType.HYSTERIA.name.lowercase(),
+                settings = OutboundBean.OutSettingsBean(),
+                streamSettings = OutboundBean.StreamSettingsBean()
+            )
+
+            // Relay-chained protocols dial the app-managed loopback relay over socks.
+            EConfigType.SSH,
+            EConfigType.DNSTT -> OutboundBean(
+                protocol = EConfigType.SOCKS.name.lowercase(),
                 settings = OutboundBean.OutSettingsBean(),
                 streamSettings = OutboundBean.StreamSettingsBean()
             )
@@ -232,6 +245,23 @@ object CoreOutboundBuilder {
             }
         }
 
+        return outboundBean
+    }
+
+    /**
+     * Builds the chain outbound for relay-backed protocols (SSH, DNSTT): a socks
+     * outbound pointing at the relay's loopback endpoint. The relay itself is started
+     * and stopped by the core service manager around the core loop.
+     */
+    private fun toOutboundLocalRelay(profileItem: ProfileItem, relayPort: Int): OutboundBean? {
+        val outboundBean = createInitOutbound(
+            if (profileItem.configType == EConfigType.DNSTT) EConfigType.DNSTT else EConfigType.SSH
+        )
+        outboundBean?.settings?.let { settings ->
+            settings.address = AppConfig.LOOPBACK
+            settings.port = relayPort
+            settings.level = AppConfig.DEFAULT_LEVEL
+        }
         return outboundBean
     }
 

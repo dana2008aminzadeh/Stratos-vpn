@@ -45,6 +45,21 @@
     <string name="menu_item_import_config_manually_trojan">ٱووردن [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">ٱووردن [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">ٱووردن [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_ssh">ٱووردن [SSH]</string>
+    <string name="menu_item_import_config_manually_dnstt">ٱووردن [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">ٱووردن [Lightway]</string>
+    <string name="server_lab_ssh_auth">تٱییی کردین</string>
+    <string name="server_lab_private_key">کلیت خصووصی</string>
+    <string name="server_lab_passphrase">پاسڤرورد کلیت</string>
+    <string name="server_lab_host_key_pin">اثر انگشت کلیت میزبان (اختیاری)</string>
+    <string name="server_lab_dnstt_pubkey">کلیت عمومی سِرور dnstt</string>
+    <string name="server_lab_dnstt_transport">ناقل</string>
+    <string name="server_lab_dnstt_resolver">Resolver دی‌ان‌اس</string>
+    <string name="server_lab_dnstt_dns">سِرور DoH/DoT</string>
+    <string name="server_lab_cipher">رمزنگاری</string>
+    <string name="server_lab_server_dn">دامنه سِرور</string>
+    <string name="server_lab_ca_cert">گواهی CA</string>
+    <string name="server_lab_lightway_mode">حالت</string>
     <string name="confirm_delete_visible_profiles">پوی کانفیگا ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_duplicate_profiles">پوی کانفیگا تکراری ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
     <string name="confirm_delete_invalid_profiles">ٱول کانفیگا ن آزمایش کۊنین. پوی کانفیگا نا موئتبر ک هیم سکو نشووݩ داڌه ابۊن پاک ابۊن، هنی هم اخۊی پاکسووݩ کۊنی؟</string>
@@ -564,6 +579,9 @@
 
     <!-- Stratos premium UI -->
     <string name="stratos_show_password">نیشووݩ داڌن رمز</string>
+    <string name="stratos_relay_failed">راه‌اندازی ناموفت تونل وصالتی</string>
+    <string name="stratos_lightway_failed">اتصال Lightway ناموفت بو</string>
+    <string name="stratos_lightway_vpn_only">پروفاییلای Lightway فقط حالت VPN وصل می شن</string>
     <string name="stratos_hide_password">قايم کردݩ رمز</string>
     <string name="stratos_server_count">%1$d سرور</string>
     <string name="stratos_expanded">واز بیڌه</string>

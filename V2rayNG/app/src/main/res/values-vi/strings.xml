@@ -45,6 +45,21 @@
     <string name="menu_item_import_config_manually_trojan">Thêm [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">Thêm [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">Thêm [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_ssh">Thêm [SSH]</string>
+    <string name="menu_item_import_config_manually_dnstt">Thêm [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">Thêm [Lightway]</string>
+    <string name="server_lab_ssh_auth">Xác thực</string>
+    <string name="server_lab_private_key">Khóa riêng tư</string>
+    <string name="server_lab_passphrase">Cụm mật khẩu</string>
+    <string name="server_lab_host_key_pin">Dấu vân tay khóa máy chủ (tùy chọn)</string>
+    <string name="server_lab_dnstt_pubkey">Khóa công khai máy chủ dnstt</string>
+    <string name="server_lab_dnstt_transport">Phương thức</string>
+    <string name="server_lab_dnstt_resolver">Bộ phân giải DNS</string>
+    <string name="server_lab_dnstt_dns">Máy chủ DoH/DoT</string>
+    <string name="server_lab_cipher">Mã hóa</string>
+    <string name="server_lab_server_dn">Tên miền máy chủ</string>
+    <string name="server_lab_ca_cert">Chứng chỉ CA</string>
+    <string name="server_lab_lightway_mode">Chế độ</string>
     <string name="confirm_delete_visible_profiles">Bạn có chắc muốn xóa tất cả cấu hình đang hiển thị không?</string>
     <string name="confirm_delete_duplicate_profiles">Bạn có chắc muốn xóa tất cả cấu hình trùng lặp đang hiển thị không?</string>
     <string name="confirm_delete_invalid_profiles">Vui lòng kiểm tra các cấu hình trước. Bạn có chắc muốn xóa tất cả cấu hình không hợp lệ đang hiển thị không?</string>
@@ -562,6 +577,9 @@
 
     <!-- Stratos premium UI -->
     <string name="stratos_show_password">Hiện mật khẩu</string>
+    <string name="stratos_relay_failed">Không khởi tạo được đường nối trung gian</string>
+    <string name="stratos_lightway_failed">Kết nối Lightway thất bại</string>
+    <string name="stratos_lightway_vpn_only">Hồ sơ Lightway chỉ kết nối ở chế độ VPN</string>
     <string name="stratos_hide_password">Ẩn mật khẩu</string>
     <string name="stratos_server_count">%1$d máy chủ</string>
     <string name="stratos_expanded">Đã mở rộng</string>

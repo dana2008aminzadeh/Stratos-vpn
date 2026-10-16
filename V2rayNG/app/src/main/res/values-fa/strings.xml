@@ -45,6 +45,21 @@
     <string name="menu_item_import_config_manually_trojan">افزودن [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">افزودن [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">افزودن [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_ssh">افزودن [SSH]</string>
+    <string name="menu_item_import_config_manually_dnstt">افزودن [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">افزودن [Lightway]</string>
+    <string name="server_lab_ssh_auth">احراز هویت</string>
+    <string name="server_lab_private_key">کلید خصوصی</string>
+    <string name="server_lab_passphrase">عبارت عبور کلید</string>
+    <string name="server_lab_host_key_pin">اثر انگشت کلید میزبان (اختیاری)</string>
+    <string name="server_lab_dnstt_pubkey">کلید عمومی سرور dnstt</string>
+    <string name="server_lab_dnstt_transport">ناقل</string>
+    <string name="server_lab_dnstt_resolver">Resolver دی‌ان‌اس</string>
+    <string name="server_lab_dnstt_dns">سرور DoH/DoT</string>
+    <string name="server_lab_cipher">رمزنگاری</string>
+    <string name="server_lab_server_dn">دامنه سرور</string>
+    <string name="server_lab_ca_cert">گواهی CA</string>
+    <string name="server_lab_lightway_mode">حالت</string>
     <string name="confirm_delete_visible_profiles">آیا مطمئن هستید که می‌خواهید همه پروفایل‌های نمایش‌داده‌شده را حذف کنید؟</string>
     <string name="confirm_delete_duplicate_profiles">آیا مطمئن هستید که می‌خواهید همه پروفایل‌های تکراری نمایش‌داده‌شده را حذف کنید؟</string>
     <string name="confirm_delete_invalid_profiles">لطفاً ابتدا پروفایل‌ها را آزمایش کنید. آیا مطمئن هستید که می‌خواهید همه پروفایل‌های نامعتبر نمایش‌داده‌شده را حذف کنید؟</string>
@@ -561,4 +576,7 @@
     <string name="connection_test_empty_message">جزئیاتی در دسترس نیست</string>
     <string name="value_unknown">ناشناخته</string>
 
+    <string name="stratos_relay_failed">راه‌اندازی ناموفق تونل ارتباطی</string>
+    <string name="stratos_lightway_failed">اتصال Lightway ناموفق بود</string>
+    <string name="stratos_lightway_vpn_only">پروفایل‌های Lightway فقط در حالت VPN وصل می‌شوند</string>
 </resources>

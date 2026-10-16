@@ -81,6 +81,66 @@ jobs:
         fileName: 'libv2ray.aar'
         out-file-path: V2rayNG/app/libs/
 
+    - name: Download Lightway AAR
+      uses: robinraju/release-downloader@v1.13
+      with:
+        repository: 'expressvpn/lightway'
+        tag: 'lightway-nightly'
+        fileName: 'lightway-release.aar'
+        out-file-path: V2rayNG/app/libs/
+
+    - name: Setup Go (dnstt client)
+      uses: actions/setup-go@v5
+      with:
+        go-version: 'stable'
+
+    - name: Build dnstt client binaries
+      # dnstt-client is packaged as libdnsttclient.so per ABI: Android only extracts
+      # executable helpers from the native library dir (W^X policy) and only accepts
+      # the lib*.so naming there in release builds. Pinned mirror commit for
+      # reproducibility; source: https://www.bamsoftware.com/git/dnstt.git
+      run: |
+        set -uo pipefail
+        echo "::notice title=Go toolchain::$(go version)"
+        SHA=f1b9b97a269f83bad41d2ceef291b4d2c161cd11
+        if ! curl -fsSL "https://github.com/tladesignz/dnstt/archive/${SHA}.tar.gz" | tar xz; then
+          echo "::error title=dnstt archive::failed to download or extract the pinned source archive"
+          exit 1
+        fi
+        cd "dnstt-${SHA}" || { echo "::error title=dnstt source::directory dnstt-${SHA} missing after extraction"; exit 1; }
+        if ! out=$(go mod download 2>&1); then
+          echo "::error title=go mod download::${out}"
+          exit 1
+        fi
+        mkdir -p ../V2rayNG/app/libs/arm64-v8a ../V2rayNG/app/libs/armeabi-v7a ../V2rayNG/app/libs/x86_64
+        if ! out=$(GOOS=android GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/arm64-v8a/libdnsttclient.so ./dnstt-client 2>&1); then
+          echo "::error title=dnstt build arm64-v8a::${out}"
+          exit 1
+        fi
+        # android/arm requires external (cgo) linking for the PIE the platform
+        # mandates, so the 32-bit build goes through the NDK clang driver (already
+        # installed for the app build) instead of the pure-Go linker.
+        NDK_CLANG="${NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang"
+        if [ ! -x "$NDK_CLANG" ]; then
+          echo "::error title=dnstt build armeabi-v7a::NDK clang not found at $NDK_CLANG"
+          exit 1
+        fi
+        if ! out=$(GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=1 CC="$NDK_CLANG" go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/armeabi-v7a/libdnsttclient.so ./dnstt-client 2>&1); then
+          echo "::error title=dnstt build armeabi-v7a::${out}"
+          exit 1
+        fi
+        # android/amd64 also requires external (cgo) linking — same NDK driver as above
+        NDK_CLANG_X64="${NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang"
+        if [ ! -x "$NDK_CLANG_X64" ]; then
+          echo "::error title=dnstt build x86_64::NDK clang not found at $NDK_CLANG_X64"
+          exit 1
+        fi
+        if ! out=$(GOOS=android GOARCH=amd64 CGO_ENABLED=1 CC="$NDK_CLANG_X64" go build -trimpath -ldflags="-s -w" -o ../V2rayNG/app/libs/x86_64/libdnsttclient.so ./dnstt-client 2>&1); then
+          echo "::error title=dnstt build x86_64::${out}"
+          exit 1
+        fi
+        ls -la ../V2rayNG/app/libs/*/libdnsttclient.so
+
     - name: Setup Java
       uses: actions/setup-java@v6.0.1
       with:
@@ -113,11 +173,38 @@ jobs:
           echo "DEBUG_KEYSTORE_USED=true" >> $GITHUB_ENV
         fi
 
-    - name: Build APK
+    - name: Prepare Gradle
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
         chmod 755 gradlew
+
+    - name: Run unit tests
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
+        if out=$(./gradlew --no-daemon :app:testPlaystoreDebugUnitTest 2>&1); then
+          echo "$out" | tail -n 25
+        else
+          status=$?
+          echo "$out" | tail -n 250
+          echo "::error title=Unit tests::gradlew :app:testPlaystoreDebugUnitTest failed (exit $status)"
+          # GitHub caps annotations per step at ten — highest value first:
+          # assertion messages, then failing test names, then fatal Gradle errors.
+          printf '%s\n' "$out" | awk '
+            /^e: / { print; if (++n >= 9) exit; next }
+            /FAILED$/ { print; c = 2; if (++n >= 9) exit; next }
+            c > 0 && /^[[:space:]]+(at |java\.|kotlin\.|org\.junit)/ { print; c--; n++; next }
+            /^FAILURE:/ { if (++n >= 9) exit; print; next }
+            /\* What went wrong:/ { if (++n >= 9) exit; print; next }
+          ' | head -n 9 | while IFS= read -r line; do
+            printf '::error title=Test failure::%s\n' "${line:0:400}"
+          done
+          exit 1
+        fi
+
+    - name: Build APK
+      run: |
+        cd ${{ github.workspace }}/V2rayNG
         ./gradlew assembleRelease \
           -Pandroid.injected.signing.store.file=${{ github.workspace }}/android_keystore.jks \
           -Pandroid.injected.signing.store.password=${{ env.KS_STORE_PASSWORD }} \

@@ -163,6 +163,18 @@ object AppConfig {
     /** Ports and addresses for various services. */
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"
+
+    /**
+     * Local loopback endpoints of the sidecar relays used by protocols Xray does not
+     * implement natively (SSH and DNSTT). The core chains to them through a socks
+     * outbound; the relays only accept loopback connections and are lifecycle-bound
+     * to the core loop.
+     */
+    const val PORT_SSH_RELAY = 10861
+    const val PORT_DNSTT_RELAY = 10862
+
+    /** Executable names (packaged as lib*.so to satisfy the Android W^X policy). */
+    const val DNSTT_CLIENT_BINARY = "libdnsttclient.so"
     const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
@@ -223,6 +235,9 @@ object AppConfig {
     const val HYSTERIA2 = "hysteria2://"
     const val HY2 = "hy2://"
     const val V2RAYNFMTS = "v2rayn://"
+    const val SSH = "ssh://"
+    const val DNSTT = "dnstt://"
+    const val LIGHTWAY = "lightway://"
 
     /** Give a good name to this, IDK*/
     const val VPN = "VPN"

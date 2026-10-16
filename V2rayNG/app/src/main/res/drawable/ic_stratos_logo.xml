@@ -1,35 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Stratos VPN brand mark (transparent background) -->
+<!-- Stratos VPN brand mark v2 (transparent background): aurora orbits + luminous core. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="96dp"
     android:height="96dp"
     android:viewportWidth="96"
     android:viewportHeight="96">
-    <group android:rotation="-20" android:pivotX="48" android:pivotY="48">
+    <!-- outer aurora ring -->
+    <group android:rotation="12" android:pivotX="48" android:pivotY="48">
         <path
-            android:pathData="M76.4,48 A28.4,11.1 0 1 1 19.6,48 A28.4,11.1 0 1 1 76.4,48"
-            android:strokeColor="#22D3EE"
-            android:strokeWidth="2.2"
-            android:strokeLineCap="round"  android:fillColor="#00000000" />
+            android:pathData="M85,48 A37,14 0 1 1 11,48 A37,14 0 1 1 85,48"
+            android:strokeColor="#A78BFA"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000" />
     </group>
-    <path android:pathData="M48,32.9a15.1,15.1 0 1,1 -0.02,0">
+    <!-- mid orbit (behind) -->
+    <group android:rotation="-26" android:pivotX="48" android:pivotY="48">
+        <path
+            android:pathData="M78,48 A30,11.5 0 1 1 18,48 A30,11.5 0 1 1 78,48"
+            android:strokeColor="#22D3EE"
+            android:strokeWidth="2.0"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000" />
+    </group>
+    <!-- planet core -->
+    <path android:pathData="M48,31a17,17 0 1,1 -0.02,0">
         <aapt:attr name="android:fillColor">
-            <gradient android:type="linear" android:startX="35.6" android:startY="35.6" android:endX="61.3" android:endY="61.3">
-                <item android:offset="0" android:color="#FF38BDF8" />
-                <item android:offset="1" android:color="#FF6366F1" />
+            <gradient
+                android:type="radial"
+                android:centerX="41"
+                android:centerY="39"
+                android:gradientRadius="22">
+                <item android:offset="0" android:color="#FF7DD3FC" />
+                <item android:offset="0.55" android:color="#FF38BDF8" />
+                <item android:offset="1" android:color="#FF4F46E5" />
             </gradient>
         </aapt:attr>
     </path>
-    <group android:rotation="-20" android:pivotX="48" android:pivotY="48">
+    <!-- inner highlight -->
+    <path android:pathData="M41,36.5a5,5 0 1,1 -0.01,0" android:fillColor="#BFFFFFFF" />
+    <!-- front orbit -->
+    <group android:rotation="-26" android:pivotX="48" android:pivotY="48">
         <path
-            android:pathData="M76.4,48 A28.4,11.1 0 0 1 19.6,48"
-            android:strokeColor="#38BDF8"
-            android:strokeWidth="2.3"
-            android:strokeLineCap="round"  android:fillColor="#00000000" />
+            android:pathData="M78,48 A30,11.5 0 0 1 18,48"
+            android:strokeColor="#67E8F9"
+            android:strokeWidth="2.4"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000" />
     </group>
-    <path android:pathData="M24.5,60.8m-2.8,0a2.8,2.8 0 1,1 5.6,0a2.8,2.8 0 1,1 -5.6,0" android:fillColor="#F0F4FF" />
-    <path android:pathData="M19.2,24.9m-1.0,0a1.0,1.0 0 1,1 2.0,0a1.0,1.0 0 1,1 -2.0,0" android:fillColor="#C8DCFF" />
-    <path android:pathData="M76.8,21.1m-0.8,0a0.8,0.8 0 1,1 1.6,0a0.8,0.8 0 1,1 -1.6,0" android:fillColor="#C8DCFF" />
-    <path android:pathData="M69.1,76.8m-0.9,0a0.9,0.9 0 1,1 1.8,0a0.9,0.9 0 1,1 -1.8,0" android:fillColor="#C8DCFF" />
+    <!-- satellite -->
+    <path
+        android:pathData="M22,62.5m-3.2,0a3.2,3.2 0 1,1 6.4,0a3.2,3.2 0 1,1 -6.4,0"
+        android:fillColor="#F5F3FF" />
+    <!-- stars -->
+    <path android:pathData="M18.2,24m-1.1,0a1.1,1.1 0 1,1 2.2,0a1.1,1.1 0 1,1 -2.2,0" android:fillColor="#DDD6FE" />
+    <path android:pathData="M78.8,20m-0.9,0a0.9,0.9 0 1,1 1.8,0a0.9,0.9 0 1,1 -1.8,0" android:fillColor="#DDD6FE" />
+    <path android:pathData="M71.4,79m-1.0,0a1.0,1.0 0 1,1 2.0,0a1.0,1.0 0 1,1 -2.0,0" android:fillColor="#DDD6FE" />
 </vector>

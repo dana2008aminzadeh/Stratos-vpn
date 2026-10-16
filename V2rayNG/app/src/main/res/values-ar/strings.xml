@@ -45,6 +45,21 @@
     <string name="menu_item_import_config_manually_trojan">إضافة [Trojan]</string>
     <string name="menu_item_import_config_manually_wireguard">إضافة [WireGuard]</string>
     <string name="menu_item_import_config_manually_hysteria2">إضافة [Hysteria2]</string>
+    <string name="menu_item_import_config_manually_ssh">إضافة [SSH]</string>
+    <string name="menu_item_import_config_manually_dnstt">إضافة [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">إضافة [Lightway]</string>
+    <string name="server_lab_ssh_auth">المصادمة</string>
+    <string name="server_lab_private_key">المفتاح الخاص</string>
+    <string name="server_lab_passphrase">العبارة السرية للمفتاح</string>
+    <string name="server_lab_host_key_pin">بصمة مفتاح المضيف (اختياري)</string>
+    <string name="server_lab_dnstt_pubkey">المفتاح العام لخادم dnstt</string>
+    <string name="server_lab_dnstt_transport">الناقل</string>
+    <string name="server_lab_dnstt_resolver">محلل DNS</string>
+    <string name="server_lab_dnstt_dns">خادم DoH/DoT</string>
+    <string name="server_lab_cipher">التشفير</string>
+    <string name="server_lab_server_dn">نطاق الخادم</string>
+    <string name="server_lab_ca_cert">شهادة CA</string>
+    <string name="server_lab_lightway_mode">الوضع</string>
     <string name="confirm_delete_visible_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المعروضة حاليًا؟</string>
     <string name="confirm_delete_duplicate_profiles">هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف المكررة المعروضة حاليًا؟</string>
     <string name="confirm_delete_invalid_profiles">يرجى اختبار ملفات التعريف أولًا. هل أنت متأكد من أنك تريد حذف جميع ملفات التعريف غير الصالحة المعروضة حاليًا؟</string>
@@ -572,6 +587,9 @@
 
     <!-- Stratos premium UI -->
     <string name="stratos_show_password">إظهار كلمة المرور</string>
+    <string name="stratos_relay_failed">فشل بدء نفق الاتصال</string>
+    <string name="stratos_lightway_failed">فشل الاتصال عبر Lightway</string>
+    <string name="stratos_lightway_vpn_only">ملفات Lightway تتصل في وضع VPN فقط</string>
     <string name="stratos_hide_password">إخفاء كلمة المرور</string>
     <string name="stratos_server_count">%1$d خوادم</string>
     <string name="stratos_expanded">موسّع</string>
