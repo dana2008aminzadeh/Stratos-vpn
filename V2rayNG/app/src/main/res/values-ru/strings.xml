@@ -573,4 +573,28 @@
     <string name="stratos_expanded">Развёрнуто</string>
     <string name="stratos_collapsed">Свёрнуто</string>
     <string name="stratos_powered_by">На базе v2rayNG • GPLv3</string>
+    <string name="menu_item_import_config_manually_dnstt">Добавить [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">Добавить [Lightway]</string>
+    <string name="menu_item_import_config_manually_ssh">Добавить [SSH]</string>
+    <string name="server_lab_dnstt_pubkey">Открытый ключ сервера</string>
+    <string name="server_lab_dnstt_pubkey_hint">64 шестнадцатеричных символа (вывод dnstt-server -gen-key)</string>
+    <string name="server_lab_dnstt_resolver">DNS-резолвер</string>
+    <string name="server_lab_dnstt_resolver_hint">udp:1.1.1.1, tls:1.1.1.1[:853] или URL DoH</string>
+    <string name="server_lab_tunnel_mtu">MTU (необязательно, по умолчанию 1280)</string>
+    <string name="server_lab_lightway_proto">Транспорт</string>
+    <string name="server_lab_lightway_cipher">Шифр</string>
+    <string name="server_lab_lightway_obfs">Пароль обфускации (необязательно)</string>
+    <string name="server_lab_ssh_auth">Аутентификация</string>
+    <string name="server_lab_ssh_username">Имя пользователя</string>
+    <string name="server_lab_ssh_password">Пароль</string>
+    <string name="server_lab_ssh_private_key">Закрытый ключ (PEM)</string>
+    <string name="server_lab_ssh_private_key_hint">Закрытый ключ PEM (OpenSSH или PKCS#8)</string>
+    <string name="server_lab_ssh_host_key">Отпечаток ключа хоста (необязательно)</string>
+    <string name="server_lab_ssh_host_key_hint">SHA256:... или MD5:...; оставьте пустым для доверия при первом подключении</string>
+    <string name="server_lab_ssh_insecure_hint">Пропустить проверку ключа хоста сервера</string>
+
+    <string name="menu_item_import_config_test">Импортировать тестовый конфиг</string>
+
+    <string name="stratos_engine_not_bundled">Туннельный движок %1$s ещё не включён в эту сборку.</string>
+
 </resources>

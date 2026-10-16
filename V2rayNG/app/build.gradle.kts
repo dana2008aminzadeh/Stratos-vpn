@@ -177,6 +177,7 @@ dependencies {
     implementation(libs.mmkv.static)
     implementation(libs.gson)
     implementation(libs.okhttp)
+    implementation(libs.jsch) // built-in SSH tunnel engine
 
     // Reactive and Utility Libraries
     implementation(libs.kotlinx.coroutines.android)

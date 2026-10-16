@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.REALITY
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
@@ -126,6 +127,9 @@ class ServerUiState(
         val isSocksOrHttp = configType == EConfigType.SOCKS || configType == EConfigType.HTTP
         val isWireguard = configType == EConfigType.WIREGUARD
         val isHysteria2 = configType == EConfigType.HYSTERIA2
+        val isDnstt = configType == EConfigType.DNSTT
+        val isLightway = configType == EConfigType.LIGHTWAY
+        val isSsh = configType == EConfigType.SSH
 
         return initialConfig.copy(
             configType = configType,
@@ -136,27 +140,31 @@ class ServerUiState(
             method = when {
                 isVmess || isShadowsocks -> method
                 isVless -> encryption
+                isLightway || isSsh -> method
                 else -> null
             },
             flow = if (isVless) flow else null,
-            username = if (isSocksOrHttp) username else null,
-            secretKey = if (isWireguard) secretKey else null,
+            username = if (isSocksOrHttp || isSsh) username else null,
+            secretKey = if (isWireguard || isSsh) secretKey else null,
             publicKey = when {
-                isWireguard -> publicKey
+                isWireguard || isDnstt || isSsh -> publicKey
                 streamSecurity == REALITY -> publicKeyReality
                 else -> null
             },
             preSharedKey = if (isWireguard) preSharedKey else null,
             reserved = if (isWireguard) reserved else null,
             localAddress = if (isWireguard) localAddress else null,
-            mtu = if (isWireguard) mtu.toIntOrNull() else null,
+            mtu = if (isWireguard || isDnstt || isLightway) mtu.toIntOrNull() else null,
             remoteDNS = if (isWireguard) remoteDNS else null,
-            obfsPassword = if (isHysteria2) obfsPassword else null,
-            portHopping = if (isHysteria2) portHopping else null,
-            portHoppingInterval = if (isHysteria2) portHoppingInterval else null,
+            obfsPassword = if (isHysteria2 || isLightway) obfsPassword else null,
+            portHopping = if (isHysteria2 || isLightway) portHopping else null,
+            portHoppingInterval = if (isHysteria2 || isLightway) portHoppingInterval else null,
             bandwidthDown = if (isHysteria2) bandwidthDown else null,
             bandwidthUp = if (isHysteria2) bandwidthUp else null,
-            network = network,
+            network = when {
+                isDnstt || isSsh -> null
+                else -> network
+            },
             headerType = headerType,
             mode = mode.nullIfBlank(),
             xhttpMode = xhttpMode.nullIfBlank(),
@@ -196,7 +204,11 @@ class ServerUiState(
                 configType = initialConfig.configType,
                 remarks = initialConfig.remarks,
                 address = initialConfig.server ?: "",
-                port = initialConfig.serverPort ?: DEFAULT_PORT.toString(),
+                port = initialConfig.serverPort ?: when (initialConfig.configType) {
+                    EConfigType.SSH -> AppConfig.SSH_DEFAULT_PORT
+                    EConfigType.DNSTT -> AppConfig.DNSTT_DEFAULT_RESOLVER_PORT
+                    else -> DEFAULT_PORT.toString()
+                },
                 password = initialConfig.password ?: "",
                 method = initialConfig.method ?: "",
                 flow = initialConfig.flow ?: "",
@@ -207,7 +219,11 @@ class ServerUiState(
                 preSharedKey = initialConfig.preSharedKey ?: "",
                 reserved = initialConfig.reserved ?: "0,0,0",
                 localAddress = initialConfig.localAddress ?: WIREGUARD_LOCAL_ADDRESS_V4,
-                mtu = initialConfig.mtu?.toString() ?: WIREGUARD_LOCAL_MTU,
+                mtu = initialConfig.mtu?.toString() ?: when (initialConfig.configType) {
+                    EConfigType.DNSTT -> AppConfig.DNSTT_DEFAULT_MTU.toString()
+                    EConfigType.LIGHTWAY -> AppConfig.LIGHTWAY_DEFAULT_MTU.toString()
+                    else -> WIREGUARD_LOCAL_MTU
+                },
                 remoteDNS = initialConfig.remoteDNS ?: WIREGUARD_LOCAL_REMOTE_DNS,
                 obfsPassword = initialConfig.obfsPassword ?: "",
                 portHopping = initialConfig.portHopping ?: "",

@@ -567,4 +567,28 @@
     <string name="stratos_expanded">Đã mở rộng</string>
     <string name="stratos_collapsed">Đã thu gọn</string>
     <string name="stratos_powered_by">Được xây dựng trên v2rayNG • GPLv3</string>
+    <string name="menu_item_import_config_manually_dnstt">Thêm [DNSTT]</string>
+    <string name="menu_item_import_config_manually_lightway">Thêm [Lightway]</string>
+    <string name="menu_item_import_config_manually_ssh">Thêm [SSH]</string>
+    <string name="server_lab_dnstt_pubkey">Khóa công khai máy chủ</string>
+    <string name="server_lab_dnstt_pubkey_hint">64 ký tự thập lục phân (kết quả của dnstt-server -gen-key)</string>
+    <string name="server_lab_dnstt_resolver">Trình phân giải DNS</string>
+    <string name="server_lab_dnstt_resolver_hint">udp:1.1.1.1, tls:1.1.1.1[:853] hoặc URL DoH</string>
+    <string name="server_lab_tunnel_mtu">MTU (tùy chọn, mặc định 1280)</string>
+    <string name="server_lab_lightway_proto">Giao thức vận chuyển</string>
+    <string name="server_lab_lightway_cipher">Mã hóa</string>
+    <string name="server_lab_lightway_obfs">Mật khẩu làm nhiễu (tùy chọn)</string>
+    <string name="server_lab_ssh_auth">Xác thực</string>
+    <string name="server_lab_ssh_username">Tên người dùng</string>
+    <string name="server_lab_ssh_password">Mật khẩu</string>
+    <string name="server_lab_ssh_private_key">Khóa riêng tư (PEM)</string>
+    <string name="server_lab_ssh_private_key_hint">Khóa riêng tư PEM kiểu OpenSSH hoặc PKCS#8</string>
+    <string name="server_lab_ssh_host_key">Dấu vân tay khóa máy chủ (tùy chọn)</string>
+    <string name="server_lab_ssh_host_key_hint">SHA256:... hoặc MD5:...; để trống để tin khi dùng lần đầu</string>
+    <string name="server_lab_ssh_insecure_hint">Bỏ qua xác minh khóa máy chủ</string>
+
+    <string name="menu_item_import_config_test">Nhập cấu hình thử nghiệm</string>
+
+    <string name="stratos_engine_not_bundled">Công cụ đường hầm %1$s chưa được kèm trong bản dựng này.</string>
+
 </resources>
