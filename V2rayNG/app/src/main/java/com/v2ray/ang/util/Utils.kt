@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.LocaleList
 import android.provider.Settings
-import android.util.Base64
 import android.util.Patterns
 import android.webkit.URLUtil
 import androidx.core.content.ContextCompat
@@ -21,6 +20,7 @@ import java.net.URI
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
+import java.util.Base64
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -81,7 +81,14 @@ object Utils {
      * @return The decoded string, or an empty string if decoding fails.
      */
     fun decode(text: String?): String {
-        return tryDecodeBase64(text) ?: text?.trimEnd('=')?.let { tryDecodeBase64(it) }.orEmpty()
+        return tryDecodeBase64(text)
+            ?: text?.trimEnd('=')?.let { tryDecodeBase64(it) }
+            ?: text?.trimEnd('=')?.let { unpadded ->
+                // java.util.Base64 may reject unpadded input that Android accepts —
+                // retry with canonical padding restored.
+                tryDecodeBase64(unpadded + "=".repeat((4 - unpadded.length % 4) % 4))
+            }
+            .orEmpty()
     }
 
     /**
@@ -94,12 +101,12 @@ object Utils {
         if (text.isNullOrEmpty()) return null
 
         try {
-            return Base64.decode(text, Base64.NO_WRAP).toString(Charsets.UTF_8)
+            return Base64.getDecoder().decode(text).toString(Charsets.UTF_8)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to decode standard base64", e)
         }
         try {
-            return Base64.decode(text, Base64.NO_WRAP.or(Base64.URL_SAFE)).toString(Charsets.UTF_8)
+            return Base64.getUrlDecoder().decode(text).toString(Charsets.UTF_8)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to decode URL-safe base64", e)
         }
@@ -115,7 +122,7 @@ object Utils {
      */
     fun encode(text: String, removePadding: Boolean = false): String {
         return try {
-            var encoded = Base64.encodeToString(text.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+            var encoded = Base64.getEncoder().encodeToString(text.toByteArray(Charsets.UTF_8))
             if (removePadding) {
                 encoded = encoded.trimEnd('=')
             }
@@ -363,7 +370,7 @@ object Utils {
     fun getDeviceIdForXUDPBaseKey(): String {
         return try {
             val androidId = Settings.Secure.ANDROID_ID.toByteArray(Charsets.UTF_8)
-            Base64.encodeToString(androidId.copyOf(32), Base64.NO_PADDING.or(Base64.URL_SAFE))
+            Base64.getUrlEncoder().withoutPadding().encodeToString(androidId.copyOf(32))
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to generate device ID", e)
             ""
